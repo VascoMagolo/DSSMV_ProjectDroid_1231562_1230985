@@ -3,7 +3,18 @@
     <style name="Base.Theme.DSSMV_ProjectDroid_1231562_1230985" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="android:windowSplashScreenBackground">@color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
+        <item name="android:windowSplashScreenAnimationDuration">2000</item> <!-- 2 segundos -->
+        <item name="android:windowSplashScreenBrandingImage">@drawable/brand_logo</item> <!-- opcional -->
+
     </style>
 
     <style name="Theme.DSSMV_ProjectDroid_1231562_1230985" parent="Base.Theme.DSSMV_ProjectDroid_1231562_1230985"/>
+    <style name="Theme.DSSMV_ProjectDroid_1231562_1230985.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
