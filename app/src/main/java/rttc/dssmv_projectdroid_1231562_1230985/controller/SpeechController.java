@@ -33,7 +33,7 @@ public class SpeechController {
         this.view = view;
     }
 
-    public void startListening() {
+    public void startListening(String targetLanguageCode) {
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             postUi("Voice recognition not available.");
             return;
@@ -45,7 +45,6 @@ public class SpeechController {
             return;
         }
 
-        // Se já está ocupado, tenta reiniciar
         if (recognizer != null) {
             try {
                 recognizer.stopListening();
@@ -80,7 +79,7 @@ public class SpeechController {
             @Override
             public void onError(int error) {
                 postUi("Recognition error: " + getErrorText(error));
-                destroy(); // garantir limpeza após erro
+                destroy();
             }
 
             @Override
@@ -91,8 +90,7 @@ public class SpeechController {
                     String recognizedText = matches.get(0);
                     postUi(recognizedText);
 
-                    // Traduzir automaticamente
-                    translateTextRapidAPI(recognizedText, "pt", "en");
+                    translateTextRapidAPI(recognizedText, "pt", targetLanguageCode);
                 } else {
                     postUi("No speech recognized.");
                 }

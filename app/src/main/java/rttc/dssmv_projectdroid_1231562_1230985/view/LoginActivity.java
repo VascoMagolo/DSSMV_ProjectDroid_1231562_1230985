@@ -18,18 +18,18 @@ public class LoginActivity extends AppCompatActivity {
         Button btnGuest = findViewById(R.id.btnGuest);
 
         btnLogin.setOnClickListener(v -> {
-            // Aqui verificas credenciais (usar DatabaseController)
+
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });
 
         btnRegister.setOnClickListener(v -> {
-            // Ir para ecrã de criação de conta
+
             startActivity(new Intent(this, RegisterActivity.class));
         });
 
         btnGuest.setOnClickListener(v -> {
-            // Acede sem login
+
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });

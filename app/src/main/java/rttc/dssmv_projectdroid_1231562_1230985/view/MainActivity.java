@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // pedir permissão logo no início
         checkAudioPermission();
 
         if (savedInstanceState == null) {
@@ -62,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
     }
-    public void startSpeechListening() {
+    public void startSpeechListening(String targetLanguageCode) {
         if (checkAudioPermission()) {
-            speechController.startListening();
+            speechController.startListening(targetLanguageCode);
         }
     }
     private boolean checkAudioPermission() {
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                speechController.startListening();
+                speechController.startListening("en");
             } else {
                 Toast.makeText(this, "Microphone permissions negated.", Toast.LENGTH_SHORT).show();
             }
