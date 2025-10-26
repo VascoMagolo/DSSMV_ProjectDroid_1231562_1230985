@@ -22,13 +22,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-public class SpeechController {
+public class ConversationController {
 
     private final Context context;
     private final ConversationFragment view;
     private SpeechRecognizer recognizer;
 
-    public SpeechController(Context context, ConversationFragment view) {
+    public ConversationController(Context context, ConversationFragment view) {
         this.context = context;
         this.view = view;
     }

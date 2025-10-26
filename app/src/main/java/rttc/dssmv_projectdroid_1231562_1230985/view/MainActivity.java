@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.controller.SpeechController;
+import rttc.dssmv_projectdroid_1231562_1230985.controller.ConversationController;
 import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.AccountFragment;
 import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ConversationFragment;
 import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ImageFragment;
@@ -20,8 +20,8 @@ import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ImageFragment;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
-    private SpeechController speechController;
-    private ConversationFragment conversationFragment; // instância única
+    private ConversationController conversationController;
+    private ConversationFragment conversationFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         conversationFragment = new ConversationFragment();
-        speechController = new SpeechController(this, conversationFragment);
+        conversationController = new ConversationController(this, conversationFragment);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void startSpeechListening(String targetLanguageCode) {
         if (checkAudioPermission()) {
-            speechController.startListening(targetLanguageCode);
+            conversationController.startListening(targetLanguageCode);
         }
     }
     private boolean checkAudioPermission() {
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                speechController.startListening("en");
+                conversationController.startListening("en");
             } else {
                 Toast.makeText(this, "Microphone permissions negated.", Toast.LENGTH_SHORT).show();
             }
