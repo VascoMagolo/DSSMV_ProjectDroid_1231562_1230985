@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "rttc.dssmv_projectdroid_1231562_1230985"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -26,6 +26,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        resources {
+            pickFirst("META-INF/INDEX.LIST")
+            pickFirst("META-INF/io.netty.versions.properties")
+        }
+    }
 }
 
 dependencies {
@@ -36,4 +42,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    implementation("org.asynchttpclient:async-http-client:3.0.3")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
 }
