@@ -1,4 +1,3 @@
-
 package rttc.dssmv_projectdroid_1231562_1230985.controller;
 import android.Manifest;
 import android.content.Context;
@@ -28,6 +27,7 @@ public class ConversationController {
     private final Context context;
     private final ConversationFragment view;
     private SpeechRecognizer recognizer;
+    private String detectedLang;
 
     public ConversationController(Context context, ConversationFragment view) {
         this.context = context;
@@ -91,7 +91,7 @@ public class ConversationController {
                     String recognizedText = matches.get(0);
                     postUi(recognizedText);
                     detectLang(recognizedText); // detect language
-                    translateTextRapidAPI(recognizedText, "pt", targetLanguageCode); // translate text
+                    translateTextRapidAPI(recognizedText, detectedLang, targetLanguageCode); // translate text
                 } else {
                     postUi("No speech recognized.");
                 }
@@ -212,7 +212,6 @@ public class ConversationController {
                 Response response = client.newCall(request).execute();
                 String responseData = response.body().string();
                 JSONObject json = new JSONObject(responseData);
-                String detectedLang;
                 if (json.has("lang")) {
                     detectedLang = json.getString("lang");
                 } else {
