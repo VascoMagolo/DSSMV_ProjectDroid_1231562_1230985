@@ -90,8 +90,7 @@ public class ConversationController {
                 if (matches != null && !matches.isEmpty()) {
                     String recognizedText = matches.get(0);
                     postUi(recognizedText);
-                    detectLang(recognizedText); // detect language
-                    translateTextRapidAPI(recognizedText, detectedLang, targetLanguageCode); // translate text
+                    detectLang(recognizedText, targetLanguageCode); // detect language
                 } else {
                     postUi("No speech recognized.");
                 }
@@ -188,7 +187,7 @@ public class ConversationController {
         }).start();
     }
 
-    public void detectLang(final String text){
+    public void detectLang(final String text, final String targetLanguageCode){
         new Thread(() -> {
             try {
                 OkHttpClient client = new OkHttpClient();
@@ -214,6 +213,7 @@ public class ConversationController {
                 JSONObject json = new JSONObject(responseData);
                 if (json.has("lang")) {
                     detectedLang = json.getString("lang");
+                    translateTextRapidAPI(text, detectedLang, targetLanguageCode);
                 } else {
                     detectedLang = "Language not detected"; // fallback
                 }
