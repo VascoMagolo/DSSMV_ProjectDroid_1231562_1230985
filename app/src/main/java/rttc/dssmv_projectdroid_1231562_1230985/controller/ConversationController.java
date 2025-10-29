@@ -230,17 +230,4 @@ public class ConversationController {
         }).start();
 
     }
-//    OkHttpClient client = new OkHttpClient();
-//
-//    MediaType mediaType = MediaType.parse("application/json");
-//    RequestBody body = RequestBody.create(mediaType, "{\"input_text\":\"This sentence is written in English. Let's detect it with the API and see what it says.\"}");
-//    Request request = new Request.Builder()
-//            .url("https://translateai.p.rapidapi.com/detect")
-//            .post(body)
-//            .addHeader("x-rapidapi-key", "cd8e2a86b8msh6e55ee3fb76aa47p1eb23cjsnbd53b690e8bc")
-//            .addHeader("x-rapidapi-host", "translateai.p.rapidapi.com")
-//            .addHeader("Content-Type", "application/json")
-//            .build();
-//
-//    Response response = client.newCall(request).execute();
 }

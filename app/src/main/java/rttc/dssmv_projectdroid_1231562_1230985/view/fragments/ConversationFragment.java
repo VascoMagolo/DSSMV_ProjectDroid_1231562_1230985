@@ -38,7 +38,7 @@ public class ConversationFragment extends Fragment {
 
         tts = new TextToSpeech(getContext(), status -> {
             if (status != TextToSpeech.ERROR) {
-                tts.setLanguage(Locale.US); // default, será mudado dinamicamente se quiser
+                tts.setLanguage(Locale.US); // default
             }
         });
 
@@ -75,18 +75,18 @@ public class ConversationFragment extends Fragment {
         });
     }
 
-    public void updateRecognizedText(String text) {
+    public void updateRecognizedText(String text) { // called from controller to update recognized text on view
         TextView txt = getView().findViewById(R.id.txtRecognized);
         if (txt != null) txt.setText(text);
     }
 
-    public void updateTranslatedText(String translated) {
+    public void updateTranslatedText(String translated) { // called from controller to update translated text on view
         TextView txt = getView().findViewById(R.id.txtTranslated);
         if (txt != null) txt.setText(translated);
-        translatedText = translated; // salva para TTS
+        translatedText = translated; //
     }
 
-    public void updateOriginalLangText(String originalLang) {
+    public void updateOriginalLangText(String originalLang) { // called from controller to update original language on view
         TextView txt = getView().findViewById(R.id.txtOriginalLang);
         if (txt != null) txt.setText(originalLang);
     }
