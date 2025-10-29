@@ -1,7 +1,12 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
 }
-
+val keysPropertiesFile = rootProject.file("keys.properties")
+val keysProperties = Properties().apply {
+    load(keysPropertiesFile.inputStream())
+}
 android {
     namespace = "rttc.dssmv_projectdroid_1231562_1230985"
     compileSdk = 34
@@ -12,8 +17,8 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "TranslateAPI_KEY", "\"${keysProperties["TranslateAPI_KEY"]}\"")
     }
 
     buildTypes {
@@ -21,6 +26,9 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
