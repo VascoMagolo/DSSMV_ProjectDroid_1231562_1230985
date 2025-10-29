@@ -68,6 +68,16 @@
                     android:text="🔊 Play Translation"
                     android:layout_marginTop="16dp"/>
 
+            <TextView
+                    android:id="@+id/txtOriginalLang"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Original Lang"
+                    android:textSize="18sp"
+                    android:textColor="@color/gray_light"
+                    android:paddingTop="12dp"/>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

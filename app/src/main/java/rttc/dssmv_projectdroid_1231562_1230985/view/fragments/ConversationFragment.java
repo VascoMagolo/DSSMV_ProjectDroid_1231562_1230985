@@ -42,8 +42,8 @@ public class ConversationFragment extends Fragment {
             }
         });
 
-        String[] languages = {"English", "Portuguese", "Spanish", "French"};
-        String[] languageCodes = {"en", "pt", "es", "fr"};
+        String[] languages = {"English", "Portuguese", "Spanish", "French", "Japanese", "Chinese", "German"}; // add more later
+        String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"}; // add more later
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, languages);
@@ -84,6 +84,11 @@ public class ConversationFragment extends Fragment {
         TextView txt = getView().findViewById(R.id.txtTranslated);
         if (txt != null) txt.setText(translated);
         translatedText = translated; // salva para TTS
+    }
+
+    public void updateOriginalLangText(String originalLang) {
+        TextView txt = getView().findViewById(R.id.txtOriginalLang);
+        if (txt != null) txt.setText(originalLang);
     }
 
     @Override
