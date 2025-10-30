@@ -7,6 +7,7 @@ val keysPropertiesFile = rootProject.file("keys.properties")
 val keysProperties = Properties().apply {
     load(keysPropertiesFile.inputStream())
 }
+
 android {
     namespace = "rttc.dssmv_projectdroid_1231562_1230985"
     compileSdk = 34
@@ -51,6 +52,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     implementation("org.asynchttpclient:async-http-client:3.0.3")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
+    implementation("com.squareup.okhttp3:okhttp:5.2.1")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
+    implementation("com.google.firebase:firebase-firestore:26.0.2")
 }
