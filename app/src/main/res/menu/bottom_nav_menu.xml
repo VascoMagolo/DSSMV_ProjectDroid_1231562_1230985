@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
             android:id="@+id/nav_voice"
             android:icon="@drawable/baseline_mic_24"
-            android:title="Chat" />
+            android:title="Voice" />
 
     <item
             android:id="@+id/nav_image"
@@ -16,6 +15,5 @@
             android:id="@+id/nav_account"
             android:icon="@drawable/outline_account_circle_24"
             android:title="Account" />
-
 
 </menu>

@@ -26,11 +26,15 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> {
 
             startActivity(new Intent(this, RegisterActivity.class));
+            finish();
         });
 
         btnGuest.setOnClickListener(v -> {
 
-            startActivity(new Intent(this, MainActivity.class));
+
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("IS_GUEST",true);
+            startActivity(intent);
             finish();
         });
     }

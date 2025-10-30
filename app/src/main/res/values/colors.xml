@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="purple_500">#6200EE</color>
-    <color name="teal_200">#03DAC5</color>
+    <!-- Paleta Principal -->
+    <color name="primary">#006C67</color> <!-- verde azulado -->
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="secondary">#FFD166</color> <!-- amarelo suave -->
+    <color name="onSecondary">#000000</color>
+    <color name="tertiary">#8692F7</color> <!-- lilás pastel -->
+
+    <!-- Fundo e cartões -->
+    <color name="background">#FAFAFA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="cardBackground">#FFFFFF</color>
+
+    <!-- Texto -->
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+
+    <!-- Outros tons -->
+    <color name="error">#D32F2F</color>
     <color name="gray_light">#E0E0E0</color>
-    <color name="teal_700">#00796B</color>
-    <color name="purple">#8692f7</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="nav_icon_checked">@color/primary</color>
+    <color name="nav_icon_unchecked">@color/textSecondary</color>
+    <color name="nav_background">@color/background</color>
 </resources>

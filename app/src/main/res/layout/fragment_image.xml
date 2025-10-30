@@ -1,31 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="match_parent">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="vertical"
-                  android:padding="16dp"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground"
+        tools:context=".view.fragments.ImageTranslationFragment">
 
-        <ImageView
-                android:id="@+id/img_preview"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="Preview da imagem" />
+    <androidx.cardview.widget.CardView
+            android:id="@+id/cardCamera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-                android:id="@+id/btn_take_photo"
-                android:text="📸 Take Photo"
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center_horizontal">
 
-        <TextView
-                android:id="@+id/text_translated_from_image"
-                android:text="Translated text will appear here"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
+            <!-- Título -->
+            <TextView
+                    android:id="@+id/txtTitle"
+                    android:text="Image Translator 📷"
+                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp" />
+
+            <!-- Preview da imagem -->
+            <ImageView
+                    android:id="@+id/img_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/image_preview"
+                    android:background="?attr/colorSurfaceVariant"
+                    android:layout_marginBottom="16dp"
+                    android:clipToOutline="true"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Botão para tirar foto -->
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_take_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📸 Take Photo"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    app:backgroundTint="?attr/colorPrimary"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:layout_marginBottom="16dp" />
+
+            <!-- Texto traduzido -->
+            <TextView
+                    android:id="@+id/text_translated_from_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Translated text will appear here"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    android:padding="8dp"
+                    android:background="?attr/colorSurfaceVariant"
+                    android:clipToOutline="true"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="2dp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

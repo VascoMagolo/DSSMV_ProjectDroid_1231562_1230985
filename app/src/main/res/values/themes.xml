@@ -1,20 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.DSSMV_ProjectDroid_1231562_1230985" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="android:windowSplashScreenBackground">@color/white</item>
+    <style name="Theme.DSSMV_ProjectDroid_1231562_1230985" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Cores -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/onPrimary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/onSecondary</item>
+
+        <!-- Fundo -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+
+        <!-- Texto -->
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
+
+        <!-- Splash screen -->
+        <item name="android:windowSplashScreenBackground">@color/primary</item>
         <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
-        <item name="android:windowSplashScreenAnimationDuration">2000</item>
-        <item name="android:windowSplashScreenBrandingImage">@drawable/brand_logo</item>
-
-    </style>
-
-    <style name="Theme.DSSMV_ProjectDroid_1231562_1230985" parent="Base.Theme.DSSMV_ProjectDroid_1231562_1230985"/>
-    <style name="Theme.DSSMV_ProjectDroid_1231562_1230985.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 </resources>
