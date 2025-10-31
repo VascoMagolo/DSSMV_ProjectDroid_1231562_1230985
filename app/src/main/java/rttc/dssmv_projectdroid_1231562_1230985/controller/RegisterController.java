@@ -7,12 +7,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.AuthResult;
 import org.jetbrains.annotations.NotNull;
 import rttc.dssmv_projectdroid_1231562_1230985.view.RegisterActivity;
-import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.RegisterFragment;
 
 public class RegisterController {
 
-    private FirebaseAuth mAuth;
-    private RegisterActivity mActivity;
+    private final FirebaseAuth mAuth;
+    private final RegisterActivity mActivity;
 
     public RegisterController(RegisterActivity mActivity) {
         this.mActivity = mActivity;

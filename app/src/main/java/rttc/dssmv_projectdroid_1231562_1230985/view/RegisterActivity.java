@@ -41,7 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void showSuccessMessage() {
-        Toast.makeText(this, "Conta criada com sucesso", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
     }
 
     public void showErrorMessage(String message) {
