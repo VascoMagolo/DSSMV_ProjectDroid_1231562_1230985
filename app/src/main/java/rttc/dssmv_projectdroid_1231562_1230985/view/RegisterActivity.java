@@ -7,21 +7,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.controller.RegisterController;
-
+import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText edtName, edtEmail, edtPassword;
     private Button btnRegister;
-    private RegisterController controller;
+    private RegisterViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_register);
 
-        controller = new RegisterController(this);
+        viewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
@@ -35,29 +36,50 @@ public class RegisterActivity extends AppCompatActivity {
                 String email = edtEmail.getText().toString();
                 String password = edtPassword.getText().toString();
 
-                controller.registerUser(name, email, password);
+                viewModel.registerUser(name, email, password);
+            }
+        });
+
+        setupObservers();
+    }
+
+    private void setupObservers() {
+
+        viewModel.isLoading.observe(this, isLoading -> {
+            btnRegister.setEnabled(!isLoading);
+        });
+
+        viewModel.errorMessage.observe(this, message -> {
+            if (message != null && !message.isEmpty()) {
+                showErrorMessage(message);
+            }
+        });
+
+        viewModel.registrationTask.observe(this, task -> {
+
+            viewModel.processRegistrationResponse(task);
+        });
+
+        viewModel.navigateToHome.observe(this, navigate -> {
+            if (navigate) {
+                showSuccessMessage();
+                navigateToHome();
+                viewModel.onNavigationComplete();
             }
         });
     }
 
-    public void showSuccessMessage() {
-        Toast.makeText(this, "Conta criada com sucesso", Toast.LENGTH_SHORT).show();
+
+    private void showSuccessMessage() {
+        Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
     }
 
-    public void showErrorMessage(String message) {
+    private void showErrorMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void navigateToHome() {
+    private void navigateToHome() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
-    }
-
-    public void disableRegisterButton() {
-        btnRegister.setEnabled(false);
-    }
-
-    public void enableRegisterButton() {
-        btnRegister.setEnabled(true);
     }
 }

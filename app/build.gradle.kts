@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 val keysPropertiesFile = rootProject.file("keys.properties")
 val keysProperties = Properties().apply {
@@ -30,6 +31,7 @@ android {
     }
     buildFeatures {
         buildConfig = true
+        dataBinding = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -55,4 +57,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.2.1")
     implementation("com.google.firebase:firebase-auth:24.0.1")
     implementation("com.google.firebase:firebase-firestore:26.0.2")
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-common-java8:*version*")
 }
