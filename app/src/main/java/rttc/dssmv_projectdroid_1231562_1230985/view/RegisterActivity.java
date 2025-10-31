@@ -21,7 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_register);
 
-        controller = new RegisterController();
+        controller = new RegisterController(this);
 
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
@@ -51,5 +51,13 @@ public class RegisterActivity extends AppCompatActivity {
     public void navigateToHome() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
+    }
+
+    public void disableRegisterButton() {
+        btnRegister.setEnabled(false);
+    }
+
+    public void enableRegisterButton() {
+        btnRegister.setEnabled(true);
     }
 }
