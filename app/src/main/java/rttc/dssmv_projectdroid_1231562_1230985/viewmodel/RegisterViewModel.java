@@ -3,9 +3,8 @@ package rttc.dssmv_projectdroid_1231562_1230985.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import rttc.dssmv_projectdroid_1231562_1230985.model.AuthRepository;
+
 
 public class RegisterViewModel extends ViewModel {
 
@@ -20,11 +19,23 @@ public class RegisterViewModel extends ViewModel {
     private MutableLiveData<Boolean> _navigateToHome = new MutableLiveData<>(false);
     public LiveData<Boolean> navigateToHome = _navigateToHome;
 
-    public LiveData<Task<AuthResult>> registrationTask;
-
+    private MutableLiveData<Boolean> _registrationSuccess = new MutableLiveData<>(false);
+    public LiveData<Boolean> registrationSuccess = _registrationSuccess;
     public RegisterViewModel() {
         authRepository = new AuthRepository();
-        registrationTask = authRepository.getRegistrationTaskLiveData();
+
+        authRepository.getRegistrationResult().observeForever(result -> {
+            _isLoading.setValue(false);
+            if (result) {
+                _navigateToHome.setValue(true);
+            }
+        });
+        authRepository.getErrorMessage().observeForever(errorMessage -> {
+            if (errorMessage != null && !errorMessage.isEmpty()){
+                _errorMessage.setValue(errorMessage);
+            }
+
+        });
     }
 
     public void registerUser(String name, String email, String password) {
@@ -33,17 +44,10 @@ public class RegisterViewModel extends ViewModel {
         }
 
         _isLoading.setValue(true);
-        authRepository.registerUser(email, password);
+        _errorMessage.setValue(null);
+        authRepository.RegisterUser(name, email, password);
     }
 
-    public void processRegistrationResponse(Task<AuthResult> task) {
-        _isLoading.setValue(false);
-        if (task.isSuccessful()) {
-            _navigateToHome.setValue(true);
-        } else {
-            _errorMessage.setValue(task.getException().getMessage());
-        }
-    }
 
     private boolean validateInput(String name, String email, String password) {
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
