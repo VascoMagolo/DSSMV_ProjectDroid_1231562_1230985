@@ -6,7 +6,6 @@ plugins {
 buildscript {
     val kotlin_version by extra("2.2.0")
     dependencies {
-        classpath("com.google.gms:google-services:4.4.4")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
     repositories {

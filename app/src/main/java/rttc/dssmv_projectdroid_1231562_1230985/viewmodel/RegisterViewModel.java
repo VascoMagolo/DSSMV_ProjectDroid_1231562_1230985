@@ -45,7 +45,7 @@ public class RegisterViewModel extends ViewModel {
 
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
-        authRepository.RegisterUser(name, email, password);
+        authRepository.RegisterUser(email, name, password);
     }
 
 
