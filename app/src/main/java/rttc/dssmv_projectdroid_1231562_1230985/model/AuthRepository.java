@@ -82,30 +82,11 @@ public class AuthRepository {
 
                 Response response = this.client.newCall(profileRequest).execute();
 
-                // 2. ADICIONADO: Tratamento de erro e logging da resposta
-                if (response.isSuccessful()) {
-                    // Sucesso!
-                    System.out.println("Perfil do utilizador criado com sucesso! (Código " + response.code() + ")");
-                } else {
-                    // Falha na chamada HTTP
-                    String responseBody = response.body() != null ? response.body().string() : "Sem corpo de erro";
-                    System.err.println("ERRO na criação do perfil no Supabase:");
-                    System.err.println("Código HTTP: " + response.code());
-                    System.err.println("Mensagem do Supabase: " + responseBody);
-
-                    // Opcional: Notificar a UI sobre a falha na criação do perfil, embora o registo já tenha falhado
-                    // errorMessage.postValue("Erro na criação do perfil: " + response.code());
-                }
-
-                if (response.body() != null) {
-                    response.body().close();
-                }
-
-            } catch (Exception e) {
-                // Exceção de rede, JSON ou outra
-                System.err.println("Exceção ao tentar criar o perfil: " + e.getMessage());
+            }catch (Exception e){
                 e.printStackTrace();
             }
+
+
         }
 
         public LiveData<Boolean> getRegistrationResult() {
