@@ -55,11 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.registrationTask.observe(this, task -> {
-
-            viewModel.processRegistrationResponse(task);
-        });
-
         viewModel.navigateToHome.observe(this, navigate -> {
             if (navigate) {
                 showSuccessMessage();

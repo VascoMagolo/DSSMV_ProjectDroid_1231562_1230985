@@ -1,6 +1,7 @@
 package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 public class User {
+    private String id;
     private String name;
     private String email;
     private String password;
@@ -9,8 +10,18 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+
     }
 
+    public User(String id, String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.id = id;
+    }
+
+    public String getId() {return id;}
+    public void setId(String id) {this.id = id;}
     public String getName() {
         return name;
     }
