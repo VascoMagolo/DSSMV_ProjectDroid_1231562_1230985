@@ -1,6 +1,4 @@
 package rttc.dssmv_projectdroid_1231562_1230985.view;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -12,13 +10,11 @@ import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ImageFragment;
 
 public class MainActivity extends AppCompatActivity {
     private ConversationFragment conversationFragment;
-    private boolean isGuestUser = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_main);
-        isGuestUser = getIntent().getBooleanExtra("IS_GUEST", false);
+        boolean isGuestUser = getIntent().getBooleanExtra("IS_GUEST", false);
 
         conversationFragment = new ConversationFragment();
 
@@ -47,9 +43,5 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, conversationFragment)
                     .commit();
         }
-    }
-
-    public void setGuestUser(boolean guest) {
-        isGuestUser = guest;
     }
 }

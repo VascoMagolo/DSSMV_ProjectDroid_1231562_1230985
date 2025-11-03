@@ -1,16 +1,11 @@
 package rttc.dssmv_projectdroid_1231562_1230985.model;
-
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
-import java.io.IOException;
-
 
 public class TranslationRepository {
 
-    private OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient();
 
     public interface TranslationCallback {
         void onSuccess(String translatedText, String detectedLang);

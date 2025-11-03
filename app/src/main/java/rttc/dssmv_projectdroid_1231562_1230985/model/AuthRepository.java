@@ -7,12 +7,11 @@ import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
-import java.io.IOException;
 public class AuthRepository {
-    private MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
-    private OkHttpClient client = new OkHttpClient();
+    private final MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
+    private final OkHttpClient client = new OkHttpClient();
 
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;

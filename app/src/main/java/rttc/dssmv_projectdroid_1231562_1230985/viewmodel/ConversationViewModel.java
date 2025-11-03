@@ -15,19 +15,19 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.TranslationRepository;
 
 public class ConversationViewModel extends AndroidViewModel {
 
-    private TranslationRepository repository;
+    private final TranslationRepository repository;
     private SpeechRecognizer recognizer;
 
-    private MutableLiveData<String> _recognizedText = new MutableLiveData<>();
+    private final MutableLiveData<String> _recognizedText = new MutableLiveData<>();
     public LiveData<String> recognizedText = _recognizedText;
 
-    private MutableLiveData<String> _translatedText = new MutableLiveData<>();
+    private final MutableLiveData<String> _translatedText = new MutableLiveData<>();
     public LiveData<String> translatedText = _translatedText;
 
-    private MutableLiveData<String> _originalLanguage = new MutableLiveData<>();
+    private final MutableLiveData<String> _originalLanguage = new MutableLiveData<>();
     public LiveData<String> originalLanguage = _originalLanguage;
 
-    private MutableLiveData<String> _statusMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> _statusMessage = new MutableLiveData<>();
     public LiveData<String> statusMessage = _statusMessage;
 
     public ConversationViewModel(@NonNull Application application) {
