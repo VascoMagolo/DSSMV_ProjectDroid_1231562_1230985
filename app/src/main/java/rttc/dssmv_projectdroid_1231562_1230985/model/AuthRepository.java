@@ -9,6 +9,7 @@ import java.io.IOException;
 public class AuthRepository {
     private MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
     private OkHttpClient client = new OkHttpClient();
 
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
@@ -88,6 +89,46 @@ public class AuthRepository {
 
 
         }
+    public void login(String email, String password) {
+        new Thread(() -> {
+            try {
+                OkHttpClient client = new OkHttpClient();
+
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("email", email);
+                jsonBody.put("password", password);
+
+                RequestBody body = RequestBody.create(
+                        jsonBody.toString(),
+                        MediaType.parse("application/json; charset=utf-8")
+                );
+
+                Request request = new Request.Builder()
+                        .url(BuildConfig.SUPABASE_URL + "/auth/v1/token?grant_type=password")
+                        .addHeader("apikey", BuildConfig.SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + BuildConfig.SUPABASE_KEY)
+                        .addHeader("Content-Type", "application/json")
+                        .post(body)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body() != null ? response.body().string() : "";
+
+                if (response.isSuccessful()) {
+                    // Podes guardar o token, se quiseres
+                    loginResult.postValue(true);
+                } else {
+                    // Ver erro devolvido pelo Supabase
+                    errorMessage.postValue("Erro no login: " + response.code() + " -> " + responseBody);
+                    loginResult.postValue(false);
+                }
+
+            } catch (Exception e) {
+                errorMessage.postValue("Exceção: " + e.getMessage());
+                loginResult.postValue(false);
+            }
+        }).start();
+    }
 
         public LiveData<Boolean> getRegistrationResult() {
             return registrationResult;
@@ -96,4 +137,8 @@ public class AuthRepository {
         public LiveData<String> getErrorMessage() {
             return errorMessage;
         }
+        public LiveData<Boolean> getLoginResult() {
+            return loginResult;
+        }
     }
+
