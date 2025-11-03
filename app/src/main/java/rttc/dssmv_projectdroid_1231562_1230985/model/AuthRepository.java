@@ -1,5 +1,7 @@
 package rttc.dssmv_projectdroid_1231562_1230985.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
@@ -46,18 +48,19 @@ public class AuthRepository {
 
                     if (response.isSuccessful()) {
                         JSONObject object = new JSONObject(responseBody);
-                        if (object.has("id")) {
-                            String id = object.getString("id");
+                        JSONObject userObj = object.optJSONObject("user");
+                        if (userObj != null && userObj.has("id")) {
+                            String id = userObj.getString("id");
                             user.setId(id);
                             createUserProfile(user);
                             registrationResult.postValue(true);
                         }
                     } else {
-                        errorMessage.postValue("Erro no registo: " + response.code());
+                        errorMessage.postValue("Registration Error: " + response.code());
                         registrationResult.postValue(false);
                     }
                 } catch (Exception e) {
-                    errorMessage.postValue("Erro: " + e.getMessage());
+                    errorMessage.postValue("Error: " + e.getMessage());
                     registrationResult.postValue(false);
                 }
             }).start();
@@ -89,7 +92,7 @@ public class AuthRepository {
 
 
         }
-    public void login(String email, String password) {
+    public void loginInSupabase(Context context, String email, String password) {
         new Thread(() -> {
             try {
                 OkHttpClient client = new OkHttpClient();
@@ -115,16 +118,20 @@ public class AuthRepository {
                 String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
-                    // Podes guardar o token, se quiseres
+                    JSONObject json = new JSONObject(responseBody);
+                    String token = json.optString("access_token", null);
+                    if (token != null) {
+                        SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
+                        prefs.edit().putString("access_token", token).apply();
+                    }
                     loginResult.postValue(true);
                 } else {
-                    // Ver erro devolvido pelo Supabase
-                    errorMessage.postValue("Erro no login: " + response.code() + " -> " + responseBody);
+                    errorMessage.postValue("Login error: " + response.code() + " -> " + responseBody);
                     loginResult.postValue(false);
                 }
 
             } catch (Exception e) {
-                errorMessage.postValue("Exceção: " + e.getMessage());
+                errorMessage.postValue("Exception: " + e.getMessage());
                 loginResult.postValue(false);
             }
         }).start();

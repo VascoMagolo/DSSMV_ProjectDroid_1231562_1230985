@@ -29,15 +29,12 @@ public class RegisterActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         btnRegister = findViewById(R.id.btnCreate);
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = edtName.getText().toString();
-                String email = edtEmail.getText().toString();
-                String password = edtPassword.getText().toString();
+        btnRegister.setOnClickListener(v -> {
+            String name = edtName.getText().toString();
+            String email = edtEmail.getText().toString();
+            String password = edtPassword.getText().toString();
 
-                viewModel.registerUser(name, email, password);
-            }
+            viewModel.registerUser(name, email, password);
         });
 
         setupObservers();
