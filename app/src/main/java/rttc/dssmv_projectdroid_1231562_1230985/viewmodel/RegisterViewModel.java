@@ -42,7 +42,8 @@ public class RegisterViewModel extends ViewModel {
         if (!validateInput(name, email, password)) {
             return;
         }
-
+        email = email.trim().toLowerCase();
+        password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
         authRepository.RegisterUser(email, name, password);

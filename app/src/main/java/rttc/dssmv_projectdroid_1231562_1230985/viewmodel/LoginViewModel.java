@@ -43,9 +43,11 @@ public class LoginViewModel extends ViewModel {
         if (!validateInput(email, password)) {
             return;
         }
+        email = email.trim().toLowerCase();
+        password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
-        authRepository.loginInSupabase(context, email, password);
+        authRepository.login(context, email, password);
     }
     private boolean validateInput(String email, String password) {
         if (email.isEmpty() || password.isEmpty()) {
