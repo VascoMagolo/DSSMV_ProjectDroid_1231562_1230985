@@ -2,12 +2,14 @@ package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
 import java.util.Objects;
 
@@ -78,39 +80,41 @@ public class AuthRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body().string();
+                String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
                     JSONArray usersArray = new JSONArray(responseBody);
                     if (usersArray.length() > 0) {
                         JSONObject userObj = usersArray.getJSONObject(0);
 
-                        // Criar o objeto User
                         User user = new User(
                                 userObj.optString("name"),
                                 userObj.optString("email"),
-                                userObj.optString("password")
+                                null
                         );
                         user.setId(userObj.optString("id"));
 
-                        saveUser(context, user);
 
+                        SessionManager session = new SessionManager(context);
+                        session.saveUser(user);
+                        Log.d("LOGIN_DEBUG", "NAME=" + userObj.optString("name") + " | ID=" + userObj.optString("id"));
                         loginResult.postValue(true);
                     } else {
-                        errorMessage.postValue("Email or password incorrect");
+                        errorMessage.postValue("Invalid email or password ");
                         loginResult.postValue(false);
                     }
                 } else {
-                    errorMessage.postValue("Login error: " + response.code() + " -> " + responseBody);
+                    errorMessage.postValue("Login error: " + response.code() + " → " + responseBody);
                     loginResult.postValue(false);
                 }
 
             } catch (Exception e) {
-                errorMessage.postValue("Exception: " + e.getMessage());
+                errorMessage.postValue("Exception during login: " + e.getMessage());
                 loginResult.postValue(false);
             }
         }).start();
     }
+
     private void saveUser(Context context, User user) {
         try {
             JSONObject json = new JSONObject();
@@ -126,29 +130,6 @@ public class AuthRepository {
         }
     }
 
-    public User getLoggedUser(Context context) {
-        try {
-            SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
-            String jsonStr = prefs.getString("user_json", null);
-            if (jsonStr == null) return null;
-
-            JSONObject obj = new JSONObject(jsonStr);
-            User user = new User(
-                    obj.getString("name"),
-                    obj.getString("email"),
-                    obj.getString("password")
-            );
-            user.setId(obj.getString("id"));
-            return user;
-        } catch (Exception e) {
-            return null;
-        }
-    } // getLoggedUser for later use
-
-    public void logout(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
-        prefs.edit().clear().apply();
-    }   // logout for later use
     public LiveData<Boolean> getRegistrationResult() {
         return registrationResult;
     }
