@@ -80,19 +80,19 @@ public class AuthRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
                     JSONArray usersArray = new JSONArray(responseBody);
                     if (usersArray.length() > 0) {
                         JSONObject userObj = usersArray.getJSONObject(0);
-
                         User user = new User(
                                 userObj.optString("name"),
                                 userObj.optString("email"),
-                                null
+                                null,
+                                userObj.optString("id")
                         );
-                        user.setId(userObj.optString("id"));
+
 
 
                         SessionManager session = new SessionManager(context);

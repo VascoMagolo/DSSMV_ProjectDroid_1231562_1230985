@@ -37,12 +37,12 @@ public class SessionManager {
             if (jsonStr == null) return null;
 
             JSONObject obj = new JSONObject(jsonStr);
-            User user = new User(
-                    obj.optString("id"),
+            return new User(
                     obj.optString("name"),
-                    obj.optString("email")
+                    obj.optString("email"),
+                    null,
+                    obj.optString("id")
             );
-            return user;
         } catch (Exception e) {
             return null;
         }
