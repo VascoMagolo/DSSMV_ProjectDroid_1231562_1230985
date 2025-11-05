@@ -2,150 +2,143 @@ package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
-import java.io.IOException;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
+
+import java.util.Objects;
+
 public class AuthRepository {
-    private MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
-    private OkHttpClient client = new OkHttpClient();
+    private final MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
+    private final OkHttpClient client = new OkHttpClient();
 
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
-    public void RegisterUser(String email, String password, String name) {
-            User user = new User(name, email, password);
-            registerInSupabase(user);
-        }
-
-        private void registerInSupabase(User user) {
-            new Thread(() -> {
-                try {
-
-                    JSONObject data = new JSONObject();
-                    data.put("email", user.getEmail());
-                    data.put("password", user.getPassword());
-
-                    RequestBody body = RequestBody.create(
-                            data.toString(),
-                            MediaType.parse("application/json")
-                    );
-
-                    Request request = new Request.Builder()
-                            .url(BuildConfig.SUPABASE_URL + "/auth/v1/signup")
-                            .post(body)
-                            .addHeader("apikey", BuildConfig.SUPABASE_KEY)
-                            .addHeader("Authorization", "Bearer " + BuildConfig.SUPABASE_KEY)
-                            .addHeader("Content-Type", "application/json")
-                            .build();
-
-                    Response response = this.client.newCall(request).execute();
-                    String responseBody = response.body().string();
-
-                    if (response.isSuccessful()) {
-                        JSONObject object = new JSONObject(responseBody);
-                        JSONObject userObj = object.optJSONObject("user");
-                        if (userObj != null && userObj.has("id")) {
-                            String id = userObj.getString("id");
-                            user.setId(id);
-                            createUserProfile(user);
-                            registrationResult.postValue(true);
-                        }
-                    } else {
-                        errorMessage.postValue("Registration Error: " + response.code());
-                        registrationResult.postValue(false);
-                    }
-                } catch (Exception e) {
-                    errorMessage.postValue("Error: " + e.getMessage());
-                    registrationResult.postValue(false);
-                }
-            }).start();
-        }
-
-        private void createUserProfile(User user) {
-            try{
-                JSONObject profileData = new JSONObject();
-                profileData.put("id", user.getId());
-                profileData.put("name", user.getName());
-                profileData.put("email", user.getEmail());
-
-                RequestBody profileBody = RequestBody.create(profileData.toString(), MediaType.parse("application/json"));
-
-                Request profileRequest = new Request.Builder()
-                        .url(SUPABASE_URL + "/rest/v1/users")
-                        .post(profileBody)
-                        .addHeader("apikey", SUPABASE_KEY)
-                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
-                        .addHeader("Content-Type", "application/json")
-                        .addHeader("Prefer", "request=minimal")
-                        .build();
-
-                Response response = this.client.newCall(profileRequest).execute();
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-
-        }
-    public void loginInSupabase(Context context, String email, String password) {
+    public void RegisterUser(String name, String email, String password) {
         new Thread(() -> {
             try {
-                OkHttpClient client = new OkHttpClient();
-
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("email", email);
-                jsonBody.put("password", password);
+                JSONObject userJson = new JSONObject();
+                userJson.put("name", name);
+                userJson.put("email", email);
+                userJson.put("password", password);
 
                 RequestBody body = RequestBody.create(
-                        jsonBody.toString(),
-                        MediaType.parse("application/json; charset=utf-8")
+                        userJson.toString(),
+                        MediaType.parse("application/json")
                 );
 
                 Request request = new Request.Builder()
-                        .url(BuildConfig.SUPABASE_URL + "/auth/v1/token?grant_type=password")
-                        .addHeader("apikey", BuildConfig.SUPABASE_KEY)
-                        .addHeader("Authorization", "Bearer " + BuildConfig.SUPABASE_KEY)
-                        .addHeader("Content-Type", "application/json")
+                        .url(SUPABASE_URL + "/rest/v1/users")
                         .post(body)
+                        .addHeader("apikey", SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("Prefer", "return=minimal")
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
-                    JSONObject json = new JSONObject(responseBody);
-                    String token = json.optString("access_token", null);
-                    if (token != null) {
-                        SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
-                        prefs.edit().putString("access_token", token).apply();
-                    }
-                    loginResult.postValue(true);
+                    registrationResult.postValue(true);
                 } else {
-                    errorMessage.postValue("Login error: " + response.code() + " -> " + responseBody);
-                    loginResult.postValue(false);
+                    errorMessage.postValue("Registration error: " + response.code() + " -> " + responseBody);
+                    registrationResult.postValue(false);
                 }
 
             } catch (Exception e) {
                 errorMessage.postValue("Exception: " + e.getMessage());
+                registrationResult.postValue(false);
+            }
+        }).start();
+    }
+
+    public void login(Context context, String email, String password) {
+        new Thread(() -> {
+            try {
+                HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/users"))
+                        .newBuilder()
+                        .addQueryParameter("email", "eq." + email)
+                        .addQueryParameter("password", "eq." + password)
+                        .addQueryParameter("select", "*")
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .get()
+                        .addHeader("apikey", SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
+                        .addHeader("Range", "0-9")
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                if (response.isSuccessful()) {
+                    JSONArray usersArray = new JSONArray(responseBody);
+                    if (usersArray.length() > 0) {
+                        JSONObject userObj = usersArray.getJSONObject(0);
+                        User user = new User(
+                                userObj.optString("name"),
+                                userObj.optString("email"),
+                                null,
+                                userObj.optString("id")
+                        );
+
+
+
+                        SessionManager session = new SessionManager(context);
+                        session.saveUser(user);
+                        Log.d("LOGIN_DEBUG", "NAME=" + userObj.optString("name") + " | ID=" + userObj.optString("id"));
+                        loginResult.postValue(true);
+                    } else {
+                        errorMessage.postValue("Invalid email or password ");
+                        loginResult.postValue(false);
+                    }
+                } else {
+                    errorMessage.postValue("Login error: " + response.code() + " → " + responseBody);
+                    loginResult.postValue(false);
+                }
+
+            } catch (Exception e) {
+                errorMessage.postValue("Exception during login: " + e.getMessage());
                 loginResult.postValue(false);
             }
         }).start();
     }
 
-        public LiveData<Boolean> getRegistrationResult() {
-            return registrationResult;
-        }
+    private void saveUser(Context context, User user) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("id", user.getId());
+            json.put("name", user.getName());
+            json.put("email", user.getEmail());
+            json.put("password", user.getPassword());
 
-        public LiveData<String> getErrorMessage() {
-            return errorMessage;
-        }
-        public LiveData<Boolean> getLoginResult() {
-            return loginResult;
+            SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
+            prefs.edit().putString("user_json", json.toString()).apply();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+    public LiveData<Boolean> getRegistrationResult() {
+        return registrationResult;
+    }
+
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
+    public LiveData<Boolean> getLoginResult() {
+        return loginResult;
+    }
+}
 

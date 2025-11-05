@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta Principal -->
-    <color name="primary">#5ADBB5</color> <!-- versão clara do verde -->
+    <color name="primary">#5ADBB5</color>
     <color name="onPrimary">#00332E</color>
     <color name="secondary">#FFE082</color>
     <color name="onSecondary">#332B00</color>
     <color name="tertiary">#B0B6FA</color>
 
-    <!-- Fundo e cartões -->
     <color name="background">#121212</color>
     <color name="surface">#1E1E1E</color>
     <color name="cardBackground">#1E1E1E</color>
 
-    <!-- Texto -->
     <color name="textPrimary">#FFFFFF</color>
     <color name="textSecondary">#BDBDBD</color>
 
-    <!-- Outros tons -->
     <color name="error">#EF9A9A</color>
     <color name="gray_light">#333333</color>
     <color name="black">#000000</color>

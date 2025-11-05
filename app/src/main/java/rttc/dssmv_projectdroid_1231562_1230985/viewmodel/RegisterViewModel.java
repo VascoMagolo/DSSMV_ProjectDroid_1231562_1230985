@@ -8,19 +8,19 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.AuthRepository;
 
 public class RegisterViewModel extends ViewModel {
 
-    private AuthRepository authRepository;
+    private final AuthRepository authRepository;
 
-    private MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
     public LiveData<Boolean> isLoading = _isLoading;
 
-    private MutableLiveData<String> _errorMessage = new MutableLiveData<>(null);
+    private final MutableLiveData<String> _errorMessage = new MutableLiveData<>(null);
     public LiveData<String> errorMessage = _errorMessage;
 
-    private MutableLiveData<Boolean> _navigateToHome = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> _navigateToHome = new MutableLiveData<>(false);
     public LiveData<Boolean> navigateToHome = _navigateToHome;
 
-    private MutableLiveData<Boolean> _registrationSuccess = new MutableLiveData<>(false);
-    public LiveData<Boolean> registrationSuccess = _registrationSuccess;
+    //private final MutableLiveData<Boolean> _registrationSuccess = new MutableLiveData<>(false);
+    //public LiveData<Boolean> registrationSuccess = _registrationSuccess; later use
     public RegisterViewModel() {
         authRepository = new AuthRepository();
 
@@ -42,7 +42,8 @@ public class RegisterViewModel extends ViewModel {
         if (!validateInput(name, email, password)) {
             return;
         }
-
+        email = email.trim().toLowerCase();
+        password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
         authRepository.RegisterUser(email, name, password);
