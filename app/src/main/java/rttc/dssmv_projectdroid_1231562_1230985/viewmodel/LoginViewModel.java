@@ -19,9 +19,6 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<Boolean> _navigateToHome = new MutableLiveData<>(false);
     public LiveData<Boolean> navigateToHome = _navigateToHome;
 
-    //private final MutableLiveData<Boolean> _loginSuccess = new MutableLiveData<>(false);
-    //public LiveData<Boolean> LoginSuccess = _loginSuccess; later use
-
     public LoginViewModel() {
         authRepository = new AuthRepository();
 
