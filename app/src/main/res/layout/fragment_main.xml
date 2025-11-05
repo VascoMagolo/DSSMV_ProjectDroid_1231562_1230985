@@ -8,7 +8,6 @@
         android:background="?android:attr/colorBackground"
         tools:context=".view.MainActivity">
 
-    <!-- Container dos fragments -->
     <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="0dp"
@@ -18,7 +17,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Barra de navegação inferior -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="0dp"

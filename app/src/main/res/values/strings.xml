@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">RTCT</string>
     <string name="image_preview">hi</string>
+    <string name="back_button">Back</string>
+    <string name="conversation_history">Conversation History</string>
+    <string name="no_conversations">No conversations yet\nStart translating to see your history here!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -130,15 +130,8 @@ public class AuthRepository {
         }
     }
 
-    public LiveData<Boolean> getRegistrationResult() {
-        return registrationResult;
-    }
-
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
-    }
-    public LiveData<Boolean> getLoginResult() {
-        return loginResult;
-    }
+    public LiveData<Boolean> getRegistrationResult() {return registrationResult;}
+    public LiveData<String> getErrorMessage() {return errorMessage;}
+    public LiveData<Boolean> getLoginResult() {return loginResult;}
 }
 

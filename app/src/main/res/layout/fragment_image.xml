@@ -28,7 +28,6 @@
                 android:padding="24dp"
                 android:gravity="center_horizontal">
 
-            <!-- Título -->
             <TextView
                     android:id="@+id/txtTitle"
                     android:text="Image Translator 📷"
@@ -39,7 +38,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp" />
 
-            <!-- Preview da imagem -->
             <ImageView
                     android:id="@+id/img_preview"
                     android:layout_width="match_parent"
@@ -53,7 +51,6 @@
                     android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Botão para tirar foto -->
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_take_photo"
                     android:layout_width="match_parent"
@@ -66,7 +63,6 @@
                     android:textColor="?attr/colorOnPrimary"
                     android:layout_marginBottom="16dp" />
 
-            <!-- Texto traduzido -->
             <TextView
                     android:id="@+id/text_translated_from_image"
                     android:layout_width="match_parent"

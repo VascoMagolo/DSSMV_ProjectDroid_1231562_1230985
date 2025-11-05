@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Locale;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationHistoryViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationViewModel;
 
 public class ConversationFragment extends Fragment {
@@ -27,16 +29,20 @@ public class ConversationFragment extends Fragment {
     private static final int REQUEST_RECORD_AUDIO = 1001;
     private ConversationViewModel viewModel;
     private TextToSpeech tts;
+    private boolean ttsReady = false;
     private String translatedText = "";
+    private ConversationHistoryViewModel historyViewModel;
 
 
     private TextView txtRecognized, txtTranslated, txtOriginalLang;
+    private Spinner spinner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         viewModel = new ViewModelProvider(this).get(ConversationViewModel.class);
+        historyViewModel = new ViewModelProvider(this).get(ConversationHistoryViewModel.class);
         return inflater.inflate(R.layout.fragment_conversation, container, false);
     }
 
@@ -44,7 +50,7 @@ public class ConversationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         Button btnSpeak = view.findViewById(R.id.btnStartListening);
         Button btnPlay = view.findViewById(R.id.btnPlayTranslation);
-        Spinner spinner = view.findViewById(R.id.spinnerTargetLanguage);
+        spinner = view.findViewById(R.id.spinnerTargetLanguage);
 
 
         txtRecognized = view.findViewById(R.id.txtRecognized);
@@ -63,16 +69,17 @@ public class ConversationFragment extends Fragment {
         });
 
         btnPlay.setOnClickListener(v -> {
-            if (!translatedText.isEmpty()) {
+            if (ttsReady && !translatedText.isEmpty()) {
                 tts.speak(translatedText, TextToSpeech.QUEUE_FLUSH, null, "tts1");
             }
         });
     }
 
     private void setupTts() {
-        tts = new TextToSpeech(getContext(), status -> {
-            if (status != TextToSpeech.ERROR) {
+        tts = new TextToSpeech(requireContext(), status -> {
+            if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(Locale.US); // default
+                ttsReady = true;
             }
         });
     }
@@ -81,7 +88,7 @@ public class ConversationFragment extends Fragment {
         String[] languages = {"English", "Portuguese", "Spanish", "French", "Japanese", "Chinese", "German"};
         String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -104,7 +111,30 @@ public class ConversationFragment extends Fragment {
 
         viewModel.translatedText.observe(getViewLifecycleOwner(), translated -> {
             txtTranslated.setText(translated);
-            translatedText = translated;
+            translatedText = translated != null ? translated : "";
+
+            String recognizedNow = txtRecognized.getText() != null ? txtRecognized.getText().toString() : "";
+            if (!translatedText.isEmpty() && !recognizedNow.isEmpty()) {
+                String originalText = recognizedNow;
+                // Prefer the latest value from ViewModel rather than parsing UI text
+                String sourceLang = viewModel.originalLanguage.getValue();
+                if (sourceLang == null || sourceLang.isEmpty()) sourceLang = "auto";
+                Object tag = spinner != null ? spinner.getTag() : null;
+                String targetLang = tag instanceof String ? (String) tag : "en";
+
+                try {
+                    Conversation conversation = new Conversation(
+                            null,
+                            originalText,
+                            translatedText,
+                            sourceLang,
+                            targetLang
+                    );
+                    historyViewModel.saveConversation(conversation, requireContext());
+                } catch (Exception e) {
+
+                }
+            }
         });
 
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {

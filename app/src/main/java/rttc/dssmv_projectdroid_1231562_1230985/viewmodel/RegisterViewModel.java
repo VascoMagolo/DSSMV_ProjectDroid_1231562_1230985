@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.model.AuthRepository;
 
-
 public class RegisterViewModel extends ViewModel {
 
     private final AuthRepository authRepository;
@@ -19,8 +18,6 @@ public class RegisterViewModel extends ViewModel {
     private final MutableLiveData<Boolean> _navigateToHome = new MutableLiveData<>(false);
     public LiveData<Boolean> navigateToHome = _navigateToHome;
 
-    //private final MutableLiveData<Boolean> _registrationSuccess = new MutableLiveData<>(false);
-    //public LiveData<Boolean> registrationSuccess = _registrationSuccess; later use
     public RegisterViewModel() {
         authRepository = new AuthRepository();
 
@@ -46,9 +43,8 @@ public class RegisterViewModel extends ViewModel {
         password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
-        authRepository.RegisterUser(email, name, password);
+        authRepository.RegisterUser(name, email, password);
     }
-
 
     private boolean validateInput(String name, String email, String password) {
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
