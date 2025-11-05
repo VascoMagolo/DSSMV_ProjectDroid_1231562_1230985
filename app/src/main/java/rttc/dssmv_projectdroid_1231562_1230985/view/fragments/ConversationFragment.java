@@ -32,7 +32,7 @@ public class ConversationFragment extends Fragment {
     private boolean ttsReady = false;
     private String translatedText = "";
     private ConversationHistoryViewModel historyViewModel;
-
+    private String currentDetectedLanguage = "auto";
 
     private TextView txtRecognized, txtTranslated, txtOriginalLang;
     private Spinner spinner;
@@ -78,7 +78,7 @@ public class ConversationFragment extends Fragment {
     private void setupTts() {
         tts = new TextToSpeech(requireContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(Locale.US); // default
+                tts.setLanguage(Locale.US);
                 ttsReady = true;
             }
         });
@@ -116,9 +116,11 @@ public class ConversationFragment extends Fragment {
             String recognizedNow = txtRecognized.getText() != null ? txtRecognized.getText().toString() : "";
             if (!translatedText.isEmpty() && !recognizedNow.isEmpty()) {
                 String originalText = recognizedNow;
-                // Prefer the latest value from ViewModel rather than parsing UI text
-                String sourceLang = viewModel.originalLanguage.getValue();
-                if (sourceLang == null || sourceLang.isEmpty()) sourceLang = "auto";
+                String sourceLang = currentDetectedLanguage;
+                if (sourceLang == null || sourceLang.isEmpty()) {
+                    sourceLang = "auto";
+                }
+
                 Object tag = spinner != null ? spinner.getTag() : null;
                 String targetLang = tag instanceof String ? (String) tag : "en";
 
@@ -136,14 +138,15 @@ public class ConversationFragment extends Fragment {
                 }
             }
         });
-
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {
-            txtOriginalLang.setText(lang);
+            if (lang != null && !lang.isEmpty()) {
+                txtOriginalLang.setText("Detected: " + lang.toUpperCase());
+                currentDetectedLanguage = lang;
+            }
         });
 
         viewModel.statusMessage.observe(getViewLifecycleOwner(), message -> {
             txtRecognized.setText(message);
-            // Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         });
     }
 

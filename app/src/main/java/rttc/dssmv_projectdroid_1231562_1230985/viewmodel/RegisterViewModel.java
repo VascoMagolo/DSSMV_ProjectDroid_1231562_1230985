@@ -61,7 +61,5 @@ public class RegisterViewModel extends ViewModel {
         return true;
     }
 
-    public void onNavigationComplete() {
-        _navigateToHome.setValue(false);
-    }
+    public void onNavigationComplete() {_navigateToHome.setValue(false);}
 }

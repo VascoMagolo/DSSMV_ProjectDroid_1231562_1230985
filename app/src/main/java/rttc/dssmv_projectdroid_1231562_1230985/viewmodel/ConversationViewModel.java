@@ -93,7 +93,7 @@ public class ConversationViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(String translatedText, String detectedLang) {
                 _translatedText.postValue(translatedText);
-                _originalLanguage.postValue("Detected: " + detectedLang);
+                _originalLanguage.postValue(detectedLang);
             }
 
             @Override

@@ -44,7 +44,6 @@ public class ConversationRepository {
 
                 conversation.setUserId(user.getId());
 
-                // Ensure timestamp is non-null
                 Date ts = conversation.getTimestamp();
                 if (ts == null) {
                     ts = new Date();
@@ -76,7 +75,6 @@ public class ConversationRepository {
                 String respBody = response.body() != null ? response.body().string() : "";
                 if (response.isSuccessful()) {
                     _saveResult.postValue(true);
-                    // Refresh list so UI updates
                     loadConversations(context);
                 } else {
                     _errorMessage.postValue("Failed to save conversation: " + response.code() + " - " + respBody);
