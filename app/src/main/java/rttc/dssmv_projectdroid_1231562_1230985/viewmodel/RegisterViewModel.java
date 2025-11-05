@@ -43,7 +43,7 @@ public class RegisterViewModel extends ViewModel {
         password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
-        authRepository.RegisterUser(email, name, password);
+        authRepository.RegisterUser(name, email, password);
     }
 
     private boolean validateInput(String name, String email, String password) {
