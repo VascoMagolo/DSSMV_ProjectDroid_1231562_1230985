@@ -1,12 +1,12 @@
-package rttc.dssmv_projectdroid_1231562_1230985.model;
+package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
-import android.os.Build;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 
 import java.util.ArrayList;
 import java.util.List;

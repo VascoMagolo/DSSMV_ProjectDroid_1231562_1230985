@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
-import rttc.dssmv_projectdroid_1231562_1230985.model.PhraseRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.repository.PhraseRepository;
 
 import java.util.List;
 

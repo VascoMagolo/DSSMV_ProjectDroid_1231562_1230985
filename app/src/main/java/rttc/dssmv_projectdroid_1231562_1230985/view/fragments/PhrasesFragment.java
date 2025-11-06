@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
-import rttc.dssmv_projectdroid_1231562_1230985.model.TranslationRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
 import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.PhraseAdapter;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.PhraseViewModel;
 
