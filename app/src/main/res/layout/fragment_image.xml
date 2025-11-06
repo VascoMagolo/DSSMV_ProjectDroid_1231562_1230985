@@ -1,84 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/colorBackground"
-        tools:context=".view.fragments.ImageTranslationFragment">
-
-    <androidx.cardview.widget.CardView
-            android:id="@+id/cardCamera"
-            android:layout_width="0dp"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:gravity="center_horizontal"
+              android:background="?attr/colorSurface">
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="?attr/colorSurface"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-        <LinearLayout
-                android:layout_width="match_parent"
+        <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:gravity="center_horizontal">
+                android:text="Translate to:"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:layout_marginEnd="8dp" />
 
-            <TextView
-                    android:id="@+id/txtTitle"
-                    android:text="Image Translator 📷"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textAlignment="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp" />
+        <Spinner
+                android:id="@+id/spinner_target_lang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/language_list"
+                android:spinnerMode="dropdown" />
+    </LinearLayout>
+    <ImageView
+            android:id="@+id/img_preview"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_marginBottom="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:background="?attr/colorPrimaryContainer"
+            android:contentDescription="@string/image_preview" />
 
-            <ImageView
-                    android:id="@+id/img_preview"
-                    android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="@string/image_preview"
-                    android:background="?attr/colorSurfaceVariant"
-                    android:layout_marginBottom="16dp"
-                    android:clipToOutline="true"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                    app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_take_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Take Photo 📸"
+            android:icon="@drawable/baseline_camera_alt_24"
+            app:iconGravity="textStart"
+            android:layout_marginBottom="20dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_take_photo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="📸 Take Photo"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:backgroundTint="?attr/colorPrimary"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:layout_marginBottom="16dp" />
+    <TextView
+            android:id="@+id/text_original"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Extracted Text:"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/colorSurfaceVariant"
+            android:padding="8dp" />
 
-            <TextView
-                    android:id="@+id/text_translated_from_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Translated text will appear here"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_horizontal"
-                    android:padding="8dp"
-                    android:background="?attr/colorSurfaceVariant"
-                    android:clipToOutline="true"
-                    android:layout_marginBottom="8dp"
-                    android:elevation="2dp" />
+    <TextView
+            android:id="@+id/text_translated_from_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Translated Text:"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:background="?attr/colorSurfaceVariant"
+            android:padding="8dp" />
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

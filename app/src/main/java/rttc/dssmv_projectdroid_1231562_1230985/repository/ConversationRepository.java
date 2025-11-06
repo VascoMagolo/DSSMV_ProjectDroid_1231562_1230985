@@ -1,4 +1,4 @@
-package rttc.dssmv_projectdroid_1231562_1230985.model;
+package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
@@ -7,6 +7,8 @@ import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
 import java.util.ArrayList;
@@ -45,7 +47,6 @@ public class ConversationRepository {
 
                 conversation.setUserId(user.getId());
 
-                // Ensure timestamp is non-null
                 Date ts = conversation.getTimestamp();
                 if (ts == null) {
                     ts = new Date();
@@ -77,7 +78,6 @@ public class ConversationRepository {
                 String respBody = response.body() != null ? response.body().string() : "";
                 if (response.isSuccessful()) {
                     _saveResult.postValue(true);
-                    // Refresh list so UI updates
                     loadConversations(context);
                 } else {
                     _errorMessage.postValue("Failed to save conversation: " + response.code() + " - " + respBody);

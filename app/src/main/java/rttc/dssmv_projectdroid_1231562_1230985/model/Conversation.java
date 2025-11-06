@@ -1,4 +1,3 @@
-// model/Conversation.java
 package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 import java.util.Date;
@@ -24,7 +23,6 @@ public class Conversation {
         this.timestamp = new Date();
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
