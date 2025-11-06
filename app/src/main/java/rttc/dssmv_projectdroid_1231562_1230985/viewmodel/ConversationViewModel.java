@@ -11,7 +11,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
-import rttc.dssmv_projectdroid_1231562_1230985.model.TranslationRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
 
 public class ConversationViewModel extends AndroidViewModel {
 
@@ -93,7 +93,7 @@ public class ConversationViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(String translatedText, String detectedLang) {
                 _translatedText.postValue(translatedText);
-                _originalLanguage.postValue("Detected: " + detectedLang);
+                _originalLanguage.postValue(detectedLang);
             }
 
             @Override

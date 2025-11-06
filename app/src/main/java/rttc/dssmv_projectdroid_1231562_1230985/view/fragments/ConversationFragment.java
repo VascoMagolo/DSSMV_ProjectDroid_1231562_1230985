@@ -32,8 +32,10 @@ public class ConversationFragment extends Fragment {
     private boolean ttsReady = false;
     private String translatedText = "";
     private ConversationHistoryViewModel historyViewModel;
-
-
+    private String currentDetectedLanguage = "auto";
+    private String pendingOriginalText = null;
+    private String pendingTranslatedText = null;
+    private String pendingDetectedLanguage = null;
     private TextView txtRecognized, txtTranslated, txtOriginalLang;
     private Spinner spinner;
 
@@ -78,7 +80,7 @@ public class ConversationFragment extends Fragment {
     private void setupTts() {
         tts = new TextToSpeech(requireContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(Locale.US); // default
+                tts.setLanguage(Locale.US);
                 ttsReady = true;
             }
         });
@@ -107,38 +109,23 @@ public class ConversationFragment extends Fragment {
     private void setupObservers() {
         viewModel.recognizedText.observe(getViewLifecycleOwner(), text -> {
             txtRecognized.setText(text);
+            pendingOriginalText = text;
+            tryToSaveConversation();
         });
 
         viewModel.translatedText.observe(getViewLifecycleOwner(), translated -> {
             txtTranslated.setText(translated);
             translatedText = translated != null ? translated : "";
-
-            String recognizedNow = txtRecognized.getText() != null ? txtRecognized.getText().toString() : "";
-            if (!translatedText.isEmpty() && !recognizedNow.isEmpty()) {
-                String originalText = recognizedNow;
-                // Prefer the latest value from ViewModel rather than parsing UI text
-                String sourceLang = viewModel.originalLanguage.getValue();
-                if (sourceLang == null || sourceLang.isEmpty()) sourceLang = "auto";
-                Object tag = spinner != null ? spinner.getTag() : null;
-                String targetLang = tag instanceof String ? (String) tag : "en";
-
-                try {
-                    Conversation conversation = new Conversation(
-                            null,
-                            originalText,
-                            translatedText,
-                            sourceLang,
-                            targetLang
-                    );
-                    historyViewModel.saveConversation(conversation, requireContext());
-                } catch (Exception e) {
-
-                }
-            }
+            pendingTranslatedText = translated;
+            tryToSaveConversation();
         });
 
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {
-            txtOriginalLang.setText(lang);
+            if (lang != null && !lang.isEmpty()) {
+                txtOriginalLang.setText("Detected: " + lang.toUpperCase());
+                pendingDetectedLanguage = lang;
+                tryToSaveConversation();
+            }
         });
 
         viewModel.statusMessage.observe(getViewLifecycleOwner(), message -> {
@@ -170,7 +157,39 @@ public class ConversationFragment extends Fragment {
             }
         }
     }
+    private void tryToSaveConversation() {
+        if (pendingOriginalText != null &&
+                pendingTranslatedText != null &&
+                pendingDetectedLanguage != null) {
 
+            String sourceLang = pendingDetectedLanguage;
+            if (sourceLang.isEmpty()) {
+                sourceLang = "auto";
+            }
+
+            Object tag = spinner != null ? spinner.getTag() : null;
+            String targetLang = tag instanceof String ? (String) tag : "en";
+
+            try {
+                Conversation conversation = new Conversation(
+                        null,
+                        pendingOriginalText,
+                        pendingTranslatedText,
+                        sourceLang,
+                        targetLang
+                );
+                historyViewModel.saveConversation(conversation, requireContext());
+
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error saving conversation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+
+            pendingOriginalText = null;
+            pendingTranslatedText = null;
+            pendingDetectedLanguage = null;
+        }
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
