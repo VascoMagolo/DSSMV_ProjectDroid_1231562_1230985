@@ -2,27 +2,32 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@android:color/background_light">
+        android:paddingTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:background="?attr/colorSurface"
+        tools:context=".view.fragments.PhrasesFragment">
 
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Quick Phrases 🗣️"
+            android:text="Quick Phrases"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="24dp" />
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="20dp">
 
         <LinearLayout
                 android:layout_width="0dp"
@@ -36,14 +41,15 @@
                     android:layout_height="wrap_content"
                     android:text="Phrases in:"
                     android:textSize="14sp"
-                    android:textColor="@android:color/black"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="4dp" />
 
             <Spinner
                     android:id="@+id/spinnerLanguage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/white"
+                    android:background="?attr/colorSurfaceContainerHigh"
                     android:padding="12dp" />
 
         </LinearLayout>
@@ -60,30 +66,32 @@
                     android:layout_height="wrap_content"
                     android:text="Translate to:"
                     android:textSize="14sp"
-                    android:textColor="@android:color/black"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="4dp" />
 
             <Spinner
                     android:id="@+id/spinnerTargetLanguage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/white"
+                    android:background="?attr/colorSurfaceContainerHigh"
                     android:padding="12dp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Área para mostrar a tradução -->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardTranslation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:visibility="gone"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/white">
+            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+            app:strokeColor="?attr/colorOutline"
+            app:strokeWidth="1dp">
 
         <LinearLayout
                 android:layout_width="match_parent"
@@ -97,7 +105,8 @@
                     android:layout_height="wrap_content"
                     android:text="Original phrase"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
@@ -107,7 +116,8 @@
                     android:layout_height="wrap_content"
                     android:text="Translated phrase"
                     android:textSize="18sp"
-                    android:textColor="@android:color/holo_blue_dark"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
@@ -117,8 +127,8 @@
                     android:layout_height="wrap_content"
                     android:text="🔊 Speak"
                     android:layout_gravity="center"
-                    android:backgroundTint="@android:color/holo_blue_dark"
-                    android:textColor="@android:color/white" />
+                    android:backgroundTint="?attr/colorPrimary"
+                    android:textColor="?attr/colorOnPrimary" />
 
         </LinearLayout>
 
@@ -129,7 +139,8 @@
             android:layout_height="wrap_content"
             android:text="Tap a phrase to translate:"
             android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
@@ -137,6 +148,8 @@
             android:id="@+id/recyclerViewPhrases"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
 
 </LinearLayout>

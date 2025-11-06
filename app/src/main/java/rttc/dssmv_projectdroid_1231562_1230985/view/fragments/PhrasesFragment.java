@@ -97,12 +97,13 @@ public class PhrasesFragment extends Fragment {
         adapter = new PhraseAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnPhraseClickListener(new PhraseAdapter.OnPhraseClickListener() {
-            @Override
-            public void onPhraseClick(GenericPhrase phrase) {
-                translateAndShowPhrase(phrase.getText(), phrase.getLanguage());
-            }
+        adapter.setOnPhraseClickListener(phrase -> {
+            textOriginalPhrase.setText(phrase.getText());
+            textTranslatedPhrase.setText("Translating...");
+            cardTranslation.setVisibility(View.VISIBLE);
+            viewModel.translatePhrase(phrase.getText(), getSelectedTargetLanguage());
         });
+
     }
 
     private void setupSourceSpinner() {
@@ -215,6 +216,11 @@ public class PhrasesFragment extends Fragment {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_LONG).show();
             }
+        });
+
+        viewModel.translatedText.observe(getViewLifecycleOwner(), translated -> {
+            textTranslatedPhrase.setText(translated);
+            currentTranslatedPhrase = translated;
         });
     }
 
