@@ -87,7 +87,7 @@ public class ConversationFragment extends Fragment {
     }
 
     private void setupSpinner(Spinner spinner) {
-        String[] languages = {"English", "Portuguese", "Spanish", "French", "Japanese", "Chinese", "German"};
+        String[] languages = {"English", "Português", "Español", "Français", "日本語", "中文", "Deutsch"};
         String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),

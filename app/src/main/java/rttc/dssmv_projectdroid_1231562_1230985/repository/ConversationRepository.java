@@ -2,6 +2,7 @@ package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -157,15 +158,15 @@ public class ConversationRepository {
         }).start();
     }
 
-    public MutableLiveData<List<Conversation>> getConversations() {
+    public LiveData<List<Conversation>> getConversations() {
         return _conversations;
     }
 
-    public MutableLiveData<String> getErrorMessage() {
+    public LiveData<String> getErrorMessage() {
         return _errorMessage;
     }
 
-    public MutableLiveData<Boolean> getSaveResult() {
+    public LiveData<Boolean> getSaveResult() {
         return _saveResult;
     }
 }

@@ -12,6 +12,11 @@
             android:title="Image" />
 
     <item
+            android:id="@+id/nav_phrases"
+            android:icon="@android:drawable/ic_dialog_email"
+            android:title="Phrases" />
+
+    <item
             android:id="@+id/nav_account"
             android:icon="@drawable/outline_account_circle_24"
             android:title="Account" />
