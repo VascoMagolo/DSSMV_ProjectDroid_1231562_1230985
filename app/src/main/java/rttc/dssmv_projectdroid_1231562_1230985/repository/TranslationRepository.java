@@ -1,4 +1,4 @@
-package rttc.dssmv_projectdroid_1231562_1230985.model;
+package rttc.dssmv_projectdroid_1231562_1230985.repository;
 import okhttp3.*;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;

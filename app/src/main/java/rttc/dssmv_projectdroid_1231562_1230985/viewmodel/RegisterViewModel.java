@@ -3,7 +3,7 @@ package rttc.dssmv_projectdroid_1231562_1230985.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import rttc.dssmv_projectdroid_1231562_1230985.model.AuthRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.repository.AuthRepository;
 
 public class RegisterViewModel extends ViewModel {
 

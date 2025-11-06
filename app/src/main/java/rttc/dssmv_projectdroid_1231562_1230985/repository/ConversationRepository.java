@@ -1,4 +1,4 @@
-package rttc.dssmv_projectdroid_1231562_1230985.model;
+package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
@@ -6,6 +6,8 @@ import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
 import java.util.ArrayList;
