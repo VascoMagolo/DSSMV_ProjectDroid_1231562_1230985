@@ -1,7 +1,5 @@
 package rttc.dssmv_projectdroid_1231562_1230985.view.fragments;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,7 +25,6 @@ import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 
 public class AccountFragment extends Fragment {
     private AccountViewModel viewModel;
-    private MaterialButton btnDeleteAccount;
     private SessionManager sessionManager;
 
     @Nullable
@@ -48,7 +45,7 @@ public class AccountFragment extends Fragment {
         TextView textGreeting = view.findViewById(R.id.textGreeting);
         MaterialButton btnHistory = view.findViewById(R.id.btnHistory);
         MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
-        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
+        MaterialButton btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
 
         User user = sessionManager.getUser();
         if (user != null) {

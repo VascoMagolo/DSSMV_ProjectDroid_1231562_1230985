@@ -3,6 +3,7 @@ package rttc.dssmv_projectdroid_1231562_1230985.repository;
 import android.content.Context;
 import android.util.Log;
 
+import java.net.SocketTimeoutException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,8 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
 import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.SUPABASE_KEY;
@@ -18,9 +21,10 @@ import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.SUPABASE_URL;
 public class AccountRepository {
 
     private final OkHttpClient client;
+
     public interface DeleteCallback {
         void onSuccess();
-        void onError(String message);
+        void onError(Exception e);
     }
 
     public AccountRepository() {
@@ -46,6 +50,7 @@ public class AccountRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
+                String responseBody = response.body() != null ? response.body().string() : "No error body";
 
                 if (response.isSuccessful()) {
                     SessionManager session = new SessionManager(context);
@@ -55,14 +60,22 @@ public class AccountRepository {
                     callback.onSuccess();
 
                 } else {
-                    String responseBody = response.body() != null ? response.body().string() : "No error body";
                     Log.e("DELETE_ACCOUNT", "Error deleting user: " + response.code() + " -> " + responseBody);
-                    callback.onError("Delete error: " + response.code() + " " + responseBody);
+
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication error: " + responseBody));
+                    } else {
+                        callback.onError(new Exception("Delete error: " + response.code() + " " + responseBody));
+                    }
                 }
+
+            } catch (SocketTimeoutException e) {
+                Log.e("DELETE_ACCOUNT", "Network timeout: " + e.getMessage());
+                callback.onError(new NetworkException("Connection timed out. Please try again."));
 
             } catch (Exception e) {
                 Log.e("DELETE_ACCOUNT", "Exception during account deletion: " + e.getMessage());
-                callback.onError("Exception during delete: " + e.getMessage());
+                callback.onError(e);
             }
         }).start();
     }

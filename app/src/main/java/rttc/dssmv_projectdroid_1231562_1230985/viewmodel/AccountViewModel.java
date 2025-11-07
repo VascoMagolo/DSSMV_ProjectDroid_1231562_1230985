@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.AccountRepository;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
@@ -45,8 +47,14 @@ public class AccountViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onError(String message) {
-                errorMessage.postValue(message);
+            public void onError(Exception e) {
+                if (e instanceof AuthException) {
+                    errorMessage.postValue("Authentication Error. Please log in again.");
+                } else if (e instanceof NetworkException) {
+                    errorMessage.postValue("Network Error: " + e.getMessage());
+                } else {
+                    errorMessage.postValue("An unexpected error occurred.");
+                }
                 deleteSuccess.postValue(false);
             }
         });

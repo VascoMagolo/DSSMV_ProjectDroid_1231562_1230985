@@ -60,7 +60,6 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         });
 
         viewModel.isLoading.observe(this, isLoading -> {
-            //opcional, talvez será implantado
         });
     }
 }

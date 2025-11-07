@@ -1,9 +1,13 @@
 package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import okhttp3.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 
 import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.TranslateAPI_KEY;
 
@@ -56,7 +60,10 @@ public class ImageRepository {
                         .getString("text");
 
                 callback.onSuccess(extractedText);
-
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("OCR request timed out."));
+            } catch (JSONException e) {
+                callback.onError(new ApiException("Failed to parse OCR response."));
             } catch (Exception e) {
                 callback.onError(e);
             }

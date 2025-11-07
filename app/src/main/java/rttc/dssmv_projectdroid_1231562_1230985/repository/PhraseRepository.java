@@ -3,7 +3,9 @@ package rttc.dssmv_projectdroid_1231562_1230985.repository;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
@@ -37,21 +39,10 @@ public class PhraseRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if(response.isSuccessful()){
-                    List<GenericPhrase> phrases = new ArrayList<>();
-                    JSONArray phrasesArray = new JSONArray(responseBody);
-
-                    for(int i = 0; i < phrasesArray.length(); i++){
-                        JSONObject object = phrasesArray.getJSONObject(i);
-                        GenericPhrase phrase = new GenericPhrase();
-                        phrase.setId(object.getString("id"));
-                        phrase.setLanguage(object.getString("language"));
-                        phrase.setCategory(object.getString("category"));
-                        phrase.setText(object.getString("text"));
-                        phrases.add(phrase);
-                    }
+                    List<GenericPhrase> phrases = getGenericPhrases(responseBody);
 
                     _phrases.postValue(phrases);
                 }else{
@@ -61,6 +52,22 @@ public class PhraseRepository {
                 _errorMessage.postValue("Exception " + e.getMessage());
             }
         }).start();
+    }
+
+    private static @NotNull List<GenericPhrase> getGenericPhrases(String responseBody) throws JSONException {
+        List<GenericPhrase> phrases = new ArrayList<>();
+        JSONArray phrasesArray = new JSONArray(responseBody);
+
+        for(int i = 0; i < phrasesArray.length(); i++){
+            JSONObject object = phrasesArray.getJSONObject(i);
+            GenericPhrase phrase = new GenericPhrase();
+            phrase.setId(object.getString("id"));
+            phrase.setLanguage(object.getString("language"));
+            phrase.setCategory(object.getString("category"));
+            phrase.setText(object.getString("text"));
+            phrases.add(phrase);
+        }
+        return phrases;
     }
 
     public LiveData<List<GenericPhrase>> getPhrases() {

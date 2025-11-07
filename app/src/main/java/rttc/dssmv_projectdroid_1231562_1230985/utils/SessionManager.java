@@ -47,20 +47,8 @@ public class SessionManager {
             return null;
         }
     }
-
-    public void saveToken(String token) {
-        prefs.edit().putString(KEY_TOKEN, token).apply();
-    }
-
-    public String getToken() {
-        return prefs.getString(KEY_TOKEN, null);
-    }
-
     public void clearSession() {
         prefs.edit().clear().apply();
     }
 
-    public boolean isLoggedIn() {
-        return prefs.contains(KEY_TOKEN) && prefs.contains(KEY_USER);
-    }
 }

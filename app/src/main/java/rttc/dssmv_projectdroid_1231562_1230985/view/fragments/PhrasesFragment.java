@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
 import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.PhraseAdapter;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.PhraseViewModel;
@@ -44,7 +43,6 @@ public class PhrasesFragment extends Fragment {
     private TextView textTranslatedPhrase;
     private Button btnSpeakTranslation;
 
-    private String currentOriginalPhrase = "";
     private String currentTranslatedPhrase = "";
 
     @Override
@@ -152,43 +150,6 @@ public class PhrasesFragment extends Fragment {
                 speakTranslation(currentTranslatedPhrase);
             }
         });
-    }
-
-    private void translateAndShowPhrase(String phrase, String sourceLanguage) {
-        if (phrase == null || phrase.isEmpty()) {
-            return;
-        }
-
-        currentOriginalPhrase = phrase;
-        String targetLanguage = getSelectedTargetLanguage();
-
-        textOriginalPhrase.setText(phrase);
-        textTranslatedPhrase.setText("Translating...");
-        cardTranslation.setVisibility(View.VISIBLE);
-
-        translationRepository.detectAndTranslate(phrase, targetLanguage,
-                new TranslationRepository.TranslationCallback() {
-                    @Override
-                    public void onSuccess(String translatedText, String detectedLang) {
-                        requireActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                currentTranslatedPhrase = translatedText;
-                                textTranslatedPhrase.setText(translatedText);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        requireActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textTranslatedPhrase.setText("Translation error");
-                            }
-                        });
-                    }
-                });
     }
 
     private String getSelectedTargetLanguage() {
