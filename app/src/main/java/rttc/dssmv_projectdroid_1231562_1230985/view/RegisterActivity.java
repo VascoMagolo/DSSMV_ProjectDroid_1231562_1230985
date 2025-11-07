@@ -12,7 +12,7 @@ import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText edtName, edtEmail, edtPassword;
+    private EditText edtName, edtEmail, edtPassword, edtConfirmPassword;
     private RegisterViewModel viewModel;
 
     @Override
@@ -25,21 +25,24 @@ public class RegisterActivity extends AppCompatActivity {
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
+        edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
         Button btnRegister = findViewById(R.id.btnCreate);
 
         btnRegister.setOnClickListener(v -> {
             String name = edtName.getText().toString();
             String email = edtEmail.getText().toString();
             String password = edtPassword.getText().toString();
+            String confirmpassword = edtConfirmPassword.getText().toString();
 
-            viewModel.registerUser(name, email, password);
+            viewModel.register(name, email, password, confirmpassword);
         });
 
-        AuthUiHelper.setupRegisterObservers(this, viewModel, btnRegister, this::navigateToHome);
+        AuthUiHelper.setupRegisterObservers(this, viewModel, btnRegister, () -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    }
-    private void navigateToHome() {
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+            startActivity(intent);
+            finish();
+        });
     }
 }

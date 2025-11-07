@@ -2,27 +2,47 @@ package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
 import android.util.Log;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import okhttp3.*;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.SocketTimeoutException;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
-import java.util.Objects;
-
 public class AuthRepository {
-    private final MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
-    private final OkHttpClient client = new OkHttpClient();
 
+    private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
-    public void RegisterUser(String name, String email, String password) {
+    public interface RegisterCallback {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
+    public interface LoginCallback {
+        void onSuccess(User user);
+        void onError(Exception e);
+    }
+
+    public AuthRepository() {
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+    }
+
+    public void RegisterUser(String name, String email, String password, RegisterCallback callback) {
         new Thread(() -> {
             try {
                 JSONObject userJson = new JSONObject();
@@ -45,23 +65,29 @@ public class AuthRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body().string();
+                String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
-                    registrationResult.postValue(true);
+                    callback.onSuccess();
                 } else {
-                    errorMessage.postValue("Registration error: " + response.code() + " -> " + responseBody);
-                    registrationResult.postValue(false);
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Registration failed: " + responseBody));
+                    } else if (response.code() == 409) {
+                        callback.onError(new AuthException("User with this email already exists."));
+                    }else {
+                        callback.onError(new ApiException("Registration error: " + response.code() + " -> " + responseBody));
+                    }
                 }
 
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Registration timed out."));
             } catch (Exception e) {
-                errorMessage.postValue("Exception: " + e.getMessage());
-                registrationResult.postValue(false);
+                callback.onError(e);
             }
         }).start();
     }
 
-    public void login(Context context, String email, String password) {
+    public void login(Context context, String email, String password, LoginCallback callback) {
         new Thread(() -> {
             try {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/users"))
@@ -96,25 +122,26 @@ public class AuthRepository {
                         SessionManager session = new SessionManager(context);
                         session.saveUser(user);
                         Log.d("LOGIN_DEBUG", "NAME=" + userObj.optString("name") + " | ID=" + userObj.optString("id"));
-                        loginResult.postValue(true);
+                        callback.onSuccess(user); // Envia o utilizador de volta
                     } else {
-                        errorMessage.postValue("Invalid email or password ");
-                        loginResult.postValue(false);
+                        // Resposta 200 (OK) mas array vazio = email/pass errada
+                        callback.onError(new AuthException("Invalid email or password."));
                     }
                 } else {
-                    errorMessage.postValue("Login error: " + response.code() + " → " + responseBody);
-                    loginResult.postValue(false);
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Login failed: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Login error: " + response.code() + " → " + responseBody));
+                    }
                 }
-
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Login timed out."));
+            } catch (JSONException e) {
+                callback.onError(new ApiException("Failed to read user data."));
             } catch (Exception e) {
-                errorMessage.postValue("Exception during login: " + e.getMessage());
-                loginResult.postValue(false);
+                callback.onError(e);
             }
         }).start();
     }
 
-    public LiveData<Boolean> getRegistrationResult() {return registrationResult;}
-    public LiveData<String> getErrorMessage() {return errorMessage;}
-    public LiveData<Boolean> getLoginResult() {return loginResult;}
 }
-

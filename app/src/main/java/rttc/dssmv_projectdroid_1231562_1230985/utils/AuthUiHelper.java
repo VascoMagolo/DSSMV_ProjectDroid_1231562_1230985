@@ -16,13 +16,15 @@ public class AuthUiHelper {
             Button actionButton,
             Runnable onNavigateHome
     ) {
-        viewModel.isLoading.observe(activity, isLoading ->
-                actionButton.setEnabled(!isLoading)
-        );
+        viewModel.isLoading.observe(activity, isLoading -> {
+            actionButton.setEnabled(!isLoading);
+            actionButton.setText(isLoading ? "Loading..." : "Login");
+        });
 
         viewModel.errorMessage.observe(activity, message -> {
             if (message != null && !message.isEmpty()) {
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                viewModel.clearErrorMessage();
             }
         });
 
@@ -39,22 +41,24 @@ public class AuthUiHelper {
             AppCompatActivity activity,
             RegisterViewModel viewModel,
             Button actionButton,
-            Runnable onNavigateHome
+            Runnable onNavigateToLogin
     ) {
-        viewModel.isLoading.observe(activity, isLoading ->
-                actionButton.setEnabled(!isLoading)
-        );
+        viewModel.isLoading.observe(activity, isLoading -> {
+            actionButton.setEnabled(!isLoading);
+            actionButton.setText(isLoading ? "Registering..." : "Register");
+        });
 
         viewModel.errorMessage.observe(activity, message -> {
             if (message != null && !message.isEmpty()) {
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                viewModel.clearErrorMessage();
             }
         });
 
-        viewModel.navigateToHome.observe(activity, navigate -> {
+        viewModel.navigateToLogin.observe(activity, navigate -> {
             if (navigate) {
                 Toast.makeText(activity, "Account created successfully", Toast.LENGTH_SHORT).show();
-                onNavigateHome.run();
+                onNavigateToLogin.run();
                 viewModel.onNavigationComplete();
             }
         });

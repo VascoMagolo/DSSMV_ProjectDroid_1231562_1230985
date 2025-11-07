@@ -5,6 +5,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.AuthRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
+
 
 public class LoginViewModel extends ViewModel {
 
@@ -21,22 +26,9 @@ public class LoginViewModel extends ViewModel {
 
     public LoginViewModel() {
         authRepository = new AuthRepository();
-
-        authRepository.getLoginResult().observeForever(result -> {
-            _isLoading.setValue(false);
-            if (result) {
-                _navigateToHome.setValue(true);
-            }
-        });
-        authRepository.getErrorMessage().observeForever(errorMessage -> {
-            if (errorMessage != null && !errorMessage.isEmpty()){
-                _errorMessage.setValue(errorMessage);
-            }
-
-        });
     }
 
-    public void LoginUser(Context context, String email, String password) {
+    public void login(Context context, String email, String password) {
         if (!validateInput(email, password)) {
             return;
         }
@@ -44,8 +36,30 @@ public class LoginViewModel extends ViewModel {
         password = password.trim();
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
-        authRepository.login(context, email, password);
+        authRepository.login(context, email, password, new AuthRepository.LoginCallback() {
+
+            @Override
+            public void onSuccess(User user) {
+                _isLoading.postValue(false);
+                _navigateToHome.postValue(true);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                _isLoading.postValue(false);
+                if (e instanceof AuthException) {
+                    _errorMessage.postValue(e.getMessage());
+                } else if (e instanceof NetworkException) {
+                    _errorMessage.postValue(e.getMessage());
+                } else if (e instanceof ApiException) {
+                    _errorMessage.postValue(e.getMessage());
+                } else {
+                    _errorMessage.postValue("An unknown login error occurred.");
+                }
+            }
+        });
     }
+
     private boolean validateInput(String email, String password) {
         if (email.isEmpty() || password.isEmpty()) {
             _errorMessage.setValue("Please fill all the fields");
@@ -60,7 +74,11 @@ public class LoginViewModel extends ViewModel {
         _errorMessage.setValue(null);
         return true;
     }
+
     public void onNavigationComplete() {
         _navigateToHome.setValue(false);
+    }
+    public void clearErrorMessage() {
+        _errorMessage.setValue(null);
     }
 }
