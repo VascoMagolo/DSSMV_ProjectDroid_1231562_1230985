@@ -32,7 +32,6 @@ public class ConversationFragment extends Fragment {
     private boolean ttsReady = false;
     private String translatedText = "";
     private ConversationHistoryViewModel historyViewModel;
-    private String currentDetectedLanguage = "auto";
     private String pendingOriginalText = null;
     private String pendingTranslatedText = null;
     private String pendingDetectedLanguage = null;

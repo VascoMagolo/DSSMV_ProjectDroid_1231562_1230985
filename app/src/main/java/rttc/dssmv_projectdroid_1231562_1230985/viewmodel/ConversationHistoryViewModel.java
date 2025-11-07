@@ -36,8 +36,4 @@ public class ConversationHistoryViewModel extends AndroidViewModel {
     public void saveConversation(Conversation conversation, Context context) {
         conversationRepository.saveConversation(conversation, context);
     }
-
-    public LiveData<Boolean> getSaveResult() {
-        return conversationRepository.getSaveResult();
-    }
 }

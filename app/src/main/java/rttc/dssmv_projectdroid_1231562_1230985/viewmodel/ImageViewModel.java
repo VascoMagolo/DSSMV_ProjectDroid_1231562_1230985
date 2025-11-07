@@ -7,7 +7,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.ImageRepository;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
-
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 public class ImageViewModel extends AndroidViewModel {
     private final ImageRepository imageRepository;
     private final TranslationRepository translationRepository;
@@ -37,7 +38,13 @@ public class ImageViewModel extends AndroidViewModel {
 
             @Override
             public void onError(Exception e) {
-                extractedText.postValue("OCR Error: " + e.getMessage());
+                if (e instanceof NetworkException) {
+                    extractedText.postValue("OCR Error: " + e.getMessage());
+                } else if (e instanceof ApiException) {
+                    extractedText.postValue("OCR Error: Could not read text from image.");
+                } else {
+                    extractedText.postValue("OCR Error: An unknown error occurred.");
+                }
                 isLoading.postValue(false);
             }
         });

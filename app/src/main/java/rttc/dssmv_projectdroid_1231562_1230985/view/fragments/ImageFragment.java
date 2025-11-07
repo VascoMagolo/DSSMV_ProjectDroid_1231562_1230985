@@ -65,7 +65,6 @@ public class ImageFragment extends Fragment {
         spinnerTargetLang = view.findViewById(R.id.spinner_target_lang);
         btnTakePhoto = view.findViewById(R.id.btn_take_photo);
 
-        // ViewModel
         viewModel = new ViewModelProvider(this).get(ImageViewModel.class);
 
         setupSpinner();

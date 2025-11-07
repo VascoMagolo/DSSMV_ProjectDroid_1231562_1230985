@@ -1,7 +1,13 @@
 package rttc.dssmv_projectdroid_1231562_1230985.repository;
 import okhttp3.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
+
+import java.net.SocketTimeoutException;
 
 public class TranslationRepository {
 
@@ -63,8 +69,12 @@ public class TranslationRepository {
                 if (json.has("lang")) {
                     callback.onSuccess(json.getString("lang"));
                 } else {
-                    callback.onSuccess("en"); // Fallback
+                    callback.onSuccess("en");// Defaults to English if detection fails
                 }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Language detection timed out."));
+            } catch (JSONException e) {
+                callback.onError(new ApiException("Failed to parse language detection response."));
             } catch (Exception e) {
                 callback.onError(e);
             }
@@ -100,8 +110,12 @@ public class TranslationRepository {
                 if (json.has("translation")) {
                     callback.onSuccess(json.getString("translation"));
                 } else {
-                    callback.onSuccess("Translation not available");
+                    callback.onError(new ApiException("Translation not available in response."));
                 }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Translation request timed out."));
+            } catch (JSONException e) {
+                callback.onError(new ApiException("Failed to parse translation response."));
             } catch (Exception e) {
                 callback.onError(e);
             }

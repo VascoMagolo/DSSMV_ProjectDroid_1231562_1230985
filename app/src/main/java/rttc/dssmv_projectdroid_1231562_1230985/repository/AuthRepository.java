@@ -1,7 +1,6 @@
 package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -94,8 +93,6 @@ public class AuthRepository {
                                 userObj.optString("id")
                         );
 
-
-
                         SessionManager session = new SessionManager(context);
                         session.saveUser(user);
                         Log.d("LOGIN_DEBUG", "NAME=" + userObj.optString("name") + " | ID=" + userObj.optString("id"));
@@ -114,21 +111,6 @@ public class AuthRepository {
                 loginResult.postValue(false);
             }
         }).start();
-    }
-
-    private void saveUser(Context context, User user) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("id", user.getId());
-            json.put("name", user.getName());
-            json.put("email", user.getEmail());
-            json.put("password", user.getPassword());
-
-            SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
-            prefs.edit().putString("user_json", json.toString()).apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public LiveData<Boolean> getRegistrationResult() {return registrationResult;}
