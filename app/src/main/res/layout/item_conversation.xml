@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+
         <TextView
                 android:id="@+id/txtOriginal"
                 android:layout_width="0dp"
