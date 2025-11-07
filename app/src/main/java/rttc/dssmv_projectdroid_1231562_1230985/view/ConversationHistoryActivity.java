@@ -33,7 +33,7 @@ public class ConversationHistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_conversation_history);
+        setContentView(R.layout.activity_conversation_history);
 
         ImageButton btnBack = findViewById(R.id.btnBack);
         recyclerView = findViewById(R.id.recyclerViewHistory);

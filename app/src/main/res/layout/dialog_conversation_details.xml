@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:text="Delete Conversation"
             android:textColor="?attr/colorOnError"
-            app:icon="@drawable/ic_delete"
+            app:icon="@drawable/baseline_delete_forever_24"
             app:iconTint="?attr/colorOnError"
             app:backgroundTint="?attr/colorErrorContainer"
             android:layout_gravity="center_horizontal"

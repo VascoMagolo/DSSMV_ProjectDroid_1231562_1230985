@@ -19,13 +19,13 @@ public class LoginActivity extends AppCompatActivity {
     private LoginViewModel viewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         SessionManager sessionManager = new SessionManager(this);
         if (sessionManager.isLoggedIn()) {
             navigateToHome();
             return;
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_login);
+        setContentView(R.layout.activity_login);
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         etEmail = findViewById(R.id.edtEmail);
