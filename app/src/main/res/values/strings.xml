@@ -6,11 +6,11 @@
     <string name="no_conversations">No conversations yet\nStart translating to see your history here!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="language_list">
-        <item>🇬🇧 English (en)</item>
-        <item>🇪🇸 Spanish (es)</item>
-        <item>🇫🇷 French (fr)</item>
-        <item>🇩🇪 German (de)</item>
-        <item>🇮🇹 Italian (it)</item>
-        <item>🇵🇹 Portuguese (pt)</item>
+    <item>🇬🇧 English (en)</item>
+    <item>🇪🇸 Spanish (es)</item>
+    <item>🇫🇷 French (fr)</item>
+    <item>🇩🇪 German (de)</item>
+    <item>🇮🇹 Italian (it)</item>
+    <item>🇵🇹 Portuguese (pt)</item>
     </string-array>
 </resources>

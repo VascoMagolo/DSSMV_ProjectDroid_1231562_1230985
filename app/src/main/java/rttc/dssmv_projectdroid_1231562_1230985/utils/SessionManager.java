@@ -4,14 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.json.JSONObject;
-
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
 public class SessionManager {
 
     private static final String PREF_NAME = "auth";
     private static final String KEY_USER = "user_json";
-    private static final String KEY_TOKEN = "access_token";
 
     private final SharedPreferences prefs;
 
@@ -47,8 +45,10 @@ public class SessionManager {
             return null;
         }
     }
+    public boolean isLoggedIn(){
+        return getUser() != null;
+    }
     public void clearSession() {
         prefs.edit().clear().apply();
     }
-
 }

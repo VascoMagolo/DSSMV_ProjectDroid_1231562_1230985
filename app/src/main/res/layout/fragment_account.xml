@@ -24,6 +24,7 @@
             android:id="@+id/btnHistory"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:text="See Conversation History"
             android:textSize="16sp"
             app:icon="@android:drawable/ic_menu_recent_history"
@@ -40,11 +41,13 @@
             app:backgroundTint="?attr/colorPrimaryContainer"
             android:textColor="?attr/colorOnPrimaryContainer" />
 
+
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDeleteAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@android:drawable/ic_delete"
+            app:icon="@drawable/baseline_delete_forever_24"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:text="Delete Account"
             android:textSize="16sp"
             android:iconTint="?attr/colorError"
@@ -65,15 +68,19 @@
             android:id="@+id/btnLogout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:icon="@drawable/baseline_logout_24"
             android:text="Logout"
             android:textSize="16sp"
             android:textAllCaps="false"
+            android:insetTop="12dp"
+            android:insetBottom="12dp"
             app:cornerRadius="16dp"
             app:iconGravity="textStart"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="32dp"
             app:backgroundTint="?attr/colorErrorContainer"
             android:textColor="?attr/colorOnErrorContainer" />
 

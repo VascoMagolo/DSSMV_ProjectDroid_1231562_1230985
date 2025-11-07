@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.AuthUiHelper;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -19,7 +20,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_login);
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isLoggedIn()) {
+            navigateToHome();
+            return;
+        }
+        setContentView(R.layout.activity_login);
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         etEmail = findViewById(R.id.edtEmail);
@@ -31,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString();
-            viewModel.LoginUser(this, email, password);
+            viewModel.login(this, email, password);
         });
         AuthUiHelper.setupLoginObservers(this, viewModel, btnLogin, this::navigateToHome);
 
@@ -48,7 +54,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void navigateToHome() {
-        startActivity(new Intent(this, MainActivity.class));
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
         finish();
     }
 }
