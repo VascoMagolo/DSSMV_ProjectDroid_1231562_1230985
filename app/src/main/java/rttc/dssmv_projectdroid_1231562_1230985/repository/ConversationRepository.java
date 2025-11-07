@@ -158,6 +158,43 @@ public class ConversationRepository {
         }).start();
     }
 
+    public void deleteConversation(Conversation conversation, Context context) {
+        new Thread(() -> {
+            try{
+                SessionManager session = new SessionManager(context);
+                User user = session.getUser();
+
+                if (user == null || user.getId() == null || conversation.getId() == null) {
+                    _errorMessage.postValue("Cannot delete: User not logged in or conversation ID null");
+                    return;
+                }
+
+                HttpUrl url =  Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/conversations"))
+                        .newBuilder()
+                        .addQueryParameter("id", "eq." + conversation.getId())
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .delete()
+                        .addHeader("apikey", SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body() != null ? response.body().string() : "";
+
+                if (response.isSuccessful()) {
+                    loadConversations(context);
+                }else{
+                    _errorMessage.postValue("Failed to delete conversation: " + response.code() + " - " + responseBody);
+                }
+            }catch (Exception e){
+                _errorMessage.postValue("Error deleting conversation " + e.getMessage());
+            }
+        }).start();
+    }
+
     public LiveData<List<Conversation>> getConversations() {
         return _conversations;
     }

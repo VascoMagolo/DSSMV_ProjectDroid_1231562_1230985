@@ -3,6 +3,7 @@ package rttc.dssmv_projectdroid_1231562_1230985.view.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,7 +16,15 @@ import java.util.Locale;
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder> {
     private List<Conversation> conversations;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+    private onDeleteClickListener onDeleteClickListener;
+    private onConversationClickListener onConversationClickListener;
 
+    public interface onConversationClickListener {
+        void onConversationClick(Conversation conversation);
+    }
+    public interface onDeleteClickListener{
+        void onDeleteClick(Conversation conversation);
+    }
     public ConversationAdapter(List<Conversation> conversations) {
         this.conversations = conversations;
     }
@@ -23,6 +32,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public void updateConversations(List<Conversation> newConversations) {
         this.conversations = newConversations;
         notifyDataSetChanged();
+    }
+
+    public void setOnConversationClickListener(onConversationClickListener onConversationClickListener) {
+        this.onConversationClickListener = onConversationClickListener;
+    }
+
+    public void setOnDeleteClickListener(onDeleteClickListener onDeleteClickListener) {
+        this.onDeleteClickListener = onDeleteClickListener;
     }
 
     @NonNull
@@ -49,6 +66,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         } else {
             holder.textTimeStamp.setText("");
         }
+
+        holder.itemView.setOnClickListener(view -> {
+            if (onConversationClickListener != null) {
+                onConversationClickListener.onConversationClick(conversation);
+            }
+        });
 
     }
 

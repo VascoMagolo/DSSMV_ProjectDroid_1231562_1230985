@@ -36,4 +36,8 @@ public class ConversationHistoryViewModel extends AndroidViewModel {
     public void saveConversation(Conversation conversation, Context context) {
         conversationRepository.saveConversation(conversation, context);
     }
+
+    public void deleteConversation(Conversation conversation, Context context) {
+        conversationRepository.deleteConversation(conversation, context);
+    }
 }
