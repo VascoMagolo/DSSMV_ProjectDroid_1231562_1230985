@@ -1,29 +1,27 @@
 package rttc.dssmv_projectdroid_1231562_1230985.view.fragments;
-
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.Locale;
-
 import rttc.dssmv_projectdroid_1231562_1230985.R;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.PhraseAdapter;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.PhraseViewModel;
 
@@ -32,17 +30,18 @@ public class PhrasesFragment extends Fragment {
     private PhraseViewModel viewModel;
     private RecyclerView recyclerView;
     private PhraseAdapter adapter;
-    private Spinner spinnerLanguage;
-    private Spinner spinnerTargetLanguage;
     private TextToSpeech tts;
-    private TranslationRepository translationRepository;
 
-
+    private AutoCompleteTextView autoCompleteLanguage;
+    private AutoCompleteTextView autoCompleteTargetLanguage;
+    private SessionManager sessionManager;
+    private String targetLang = "en";
+    private String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
     private CardView cardTranslation;
     private TextView textOriginalPhrase;
     private TextView textTranslatedPhrase;
-    private Button btnSpeakTranslation;
-
+    private MaterialButton btnSpeakTranslation;
     private String currentTranslatedPhrase = "";
 
     @Override
@@ -51,7 +50,7 @@ public class PhrasesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_phrases, container, false);
 
         viewModel = new ViewModelProvider(this).get(PhraseViewModel.class);
-        translationRepository = new TranslationRepository();
+        sessionManager = new SessionManager(requireContext());
 
         return view;
     }
@@ -61,8 +60,8 @@ public class PhrasesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerView = view.findViewById(R.id.recyclerViewPhrases);
-        spinnerLanguage = view.findViewById(R.id.spinnerLanguage);
-        spinnerTargetLanguage = view.findViewById(R.id.spinnerTargetLanguage);
+        autoCompleteLanguage = view.findViewById(R.id.autoCompleteLanguage);
+        autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
 
         cardTranslation = view.findViewById(R.id.cardTranslation);
         textOriginalPhrase = view.findViewById(R.id.textOriginalPhrase);
@@ -71,12 +70,10 @@ public class PhrasesFragment extends Fragment {
 
         setupTTS();
         setupRecyclerView();
-        setupSourceSpinner();
-        setupTargetSpinner();
+        setupLanguageMenus();
         setupTranslationCard();
         setupObservers();
-
-        viewModel.loadPhrases("pt");
+        viewModel.loadPhrases(languageCodes[0]);
     }
 
     private void setupTTS() {
@@ -99,48 +96,51 @@ public class PhrasesFragment extends Fragment {
             textOriginalPhrase.setText(phrase.getText());
             textTranslatedPhrase.setText("Translating...");
             cardTranslation.setVisibility(View.VISIBLE);
-            viewModel.translatePhrase(phrase.getText(), getSelectedTargetLanguage());
+            viewModel.translatePhrase(phrase.getText(), targetLang);
         });
 
     }
-
-    private void setupSourceSpinner() {
-        String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
-        String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
-
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                getContext(),
-                android.R.layout.simple_spinner_item,
+    private void setupLanguageMenus() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
                 languages
         );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerLanguage.setAdapter(spinnerAdapter);
+        autoCompleteLanguage.setAdapter(adapter);
+        autoCompleteTargetLanguage.setAdapter(adapter);
+        autoCompleteLanguage.setText(languages[0], false);
+        autoCompleteLanguage.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedLanguage = languageCodes[position];
+            viewModel.loadPhrases(selectedLanguage);
+        });
+        User user = sessionManager.getUser();
+        String preferredLangCode = "en";
+        if (user != null && user.getPreferredLanguage() != null) {
+            preferredLangCode = user.getPreferredLanguage();
+        }
 
-        spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedLanguage = languageCodes[position];
-                viewModel.loadPhrases(selectedLanguage);
+        String preferredLangName = getLanguageNameFromCode(preferredLangCode);
+        autoCompleteTargetLanguage.setText(preferredLangName, false);
+        targetLang = preferredLangCode;
+
+        autoCompleteTargetLanguage.setOnItemClickListener((parent, view, position, id) -> {
+            targetLang = languageCodes[position];
+        });
+    }
+
+    private String getLanguageNameFromCode(String langCode) {
+        if (langCode == null) {
+            return languages[1];
+        }
+
+        String trimmedLangCode = langCode.trim();
+
+        for (int i = 0; i < languageCodes.length; i++) {
+            if (languageCodes[i].equalsIgnoreCase(trimmedLangCode)) {
+                return languages[i];
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-    }
-
-    private void setupTargetSpinner() {
-        String[] languages = {"English", "Português", "Español", "Français", "日本語", "中文", "Deutsch"};
-        String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"};
-
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                getContext(),
-                android.R.layout.simple_spinner_item,
-                languages
-        );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTargetLanguage.setAdapter(spinnerAdapter);
-
-        spinnerTargetLanguage.setSelection(0);
+        }
+        return languages[1];
     }
 
     private void setupTranslationCard() {
@@ -150,12 +150,6 @@ public class PhrasesFragment extends Fragment {
                 speakTranslation(currentTranslatedPhrase);
             }
         });
-    }
-
-    private String getSelectedTargetLanguage() {
-        String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"};
-        int position = spinnerTargetLanguage.getSelectedItemPosition();
-        return languageCodes[position];
     }
 
     private void speakTranslation(String translatedText) {

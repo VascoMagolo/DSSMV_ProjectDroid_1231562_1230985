@@ -14,7 +14,6 @@ import java.util.List;
 public class ConversationHistoryViewModel extends AndroidViewModel {
     private final ConversationRepository conversationRepository;
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
-    public LiveData<Boolean> isLoading = _isLoading;
 
     public ConversationHistoryViewModel(@NonNull Application application) {
         super(application);

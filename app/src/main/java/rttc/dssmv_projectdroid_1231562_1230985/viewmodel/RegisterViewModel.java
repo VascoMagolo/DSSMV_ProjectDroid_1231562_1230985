@@ -24,8 +24,8 @@ public class RegisterViewModel extends ViewModel {
         authRepository = new AuthRepository();
     }
 
-    public void register(String name, String email, String password, String confirmPassword) {
-        if (!validateInput(name, email, password, confirmPassword)) {
+    public void register(String name, String email, String password, String confirmPassword, String preferredLanguage) {
+        if (!validateInput(name, email, password, confirmPassword, preferredLanguage)) {
             return;
         }
         email = email.trim().toLowerCase();
@@ -35,7 +35,7 @@ public class RegisterViewModel extends ViewModel {
         _isLoading.setValue(true);
         _errorMessage.setValue(null);
 
-        authRepository.RegisterUser(name, email, password, new AuthRepository.RegisterCallback() {
+        authRepository.RegisterUser(name, email, password, preferredLanguage, new AuthRepository.RegisterCallback() {
 
             @Override
             public void onSuccess() {
@@ -59,7 +59,7 @@ public class RegisterViewModel extends ViewModel {
         });
     }
 
-    private boolean validateInput(String name, String email, String password, String confirmPassword) {
+    private boolean validateInput(String name, String email, String password, String confirmPassword, String preferredLanguage) {
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             _errorMessage.setValue("Please fill all the fields");
             return false;
@@ -74,7 +74,10 @@ public class RegisterViewModel extends ViewModel {
             _errorMessage.setValue("Passwords do not match");
             return false;
         }
-
+        if (preferredLanguage == null || preferredLanguage.isEmpty()) {
+            _errorMessage.setValue("Please select a preferred language");
+            return false;
+        }
         _errorMessage.setValue(null);
         return true;
     }

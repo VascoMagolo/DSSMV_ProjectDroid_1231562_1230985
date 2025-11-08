@@ -46,9 +46,7 @@ public class ConversationHistoryActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(ConversationHistoryViewModel.class);
 
-        adapter.setOnConversationClickListener(conversation -> {
-            showConversationDetailsDialog(conversation);
-        });
+        adapter.setOnConversationClickListener(this::showConversationDetailsDialog);
 
         setupObservers();
         viewModel.loadConversation(this);

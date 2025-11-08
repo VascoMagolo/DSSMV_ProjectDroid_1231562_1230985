@@ -6,13 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/colorSurface"
-        android:padding="16dp"
         tools:context=".view.fragments.ConversationFragment">
-
     <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardConversation"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="4dp"
             app:strokeWidth="1dp"
@@ -22,21 +20,20 @@
             app:layout_constraintBottom_toTopOf="@+id/btnStartListening"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="16dp">
-
+            android:layout_margin="24dp">
         <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:gravity="center"
                 android:padding="24dp">
 
             <TextView
                     android:id="@+id/txtTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Voice Translation 🎙️"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
+                    android:text="Translation by voice"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="?attr/colorOnSurface"
                     android:gravity="center" />
 
@@ -44,48 +41,56 @@
                     android:id="@+id/txtRecognized"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Your speech will appear here..."
-                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    android:text="Your voice will appear here..."
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:gravity="center_horizontal" />
+                    android:gravity="center_horizontal"
+                    android:minLines="2" />
 
             <TextView
                     android:id="@+id/txtTranslated"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Translated text will appear here..."
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:text="The translation will appear here..."
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textColor="?attr/colorPrimary"
-                    android:gravity="center_horizontal" />
+                    android:gravity="center_horizontal"
+                    android:minLines="2" />
 
-            <Spinner
-                    android:id="@+id/spinnerTargetLanguage"
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/menuTargetLanguage"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="wrap_content"
+                    android:minWidth="200dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="8dp"
-                    android:backgroundTint="?attr/colorPrimary"
-                    android:popupBackground="?attr/colorSurfaceContainerHigh" />
+                    android:hint="Translate to:">
+
+                <AutoCompleteTextView
+                        android:id="@+id/autoCompleteTargetLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        tools:ignore="LabelFor" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPlayTranslation"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Play Translation"
+                    android:text="Listen"
                     android:textAllCaps="false"
-                    android:icon="@android:drawable/ic_media_play"
                     android:insetTop="8dp"
                     android:insetBottom="8dp"
                     app:cornerRadius="20dp"
                     app:iconGravity="textStart"
                     android:layout_gravity="center"
-                    android:layout_marginTop="12dp"
-                    app:backgroundTint="?attr/colorSecondaryContainer"
-                    android:textColor="?attr/colorOnSecondaryContainer" />
+                    android:layout_marginTop="12dp"/>
 
             <TextView
                     android:id="@+id/txtOriginalLang"
@@ -93,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Original Language: —"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center" />
         </LinearLayout>
@@ -103,8 +108,8 @@
             android:id="@+id/btnStartListening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Talk"
-            android:icon="@drawable/baseline_mic_24"
+            android:text="Speak"
+            app:icon="@drawable/baseline_mic_24"
             app:iconPadding="8dp"
             app:iconGravity="textStart"
             app:backgroundTint="?attr/colorPrimary"

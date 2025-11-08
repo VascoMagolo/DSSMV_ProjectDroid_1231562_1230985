@@ -23,6 +23,7 @@ public class SessionManager {
             obj.put("id", user.getId());
             obj.put("name", user.getName());
             obj.put("email", user.getEmail());
+            obj.put("preferred_language", user.getPreferredLanguage());
             prefs.edit().putString(KEY_USER, obj.toString()).apply();
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,7 +40,8 @@ public class SessionManager {
                     obj.optString("name"),
                     obj.optString("email"),
                     null,
-                    obj.optString("id")
+                    obj.optString("id"),
+                    obj.optString("preferred_language", "en")
             );
         } catch (Exception e) {
             return null;

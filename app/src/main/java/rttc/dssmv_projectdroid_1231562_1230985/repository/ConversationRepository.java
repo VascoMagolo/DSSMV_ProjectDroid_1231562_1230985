@@ -28,12 +28,6 @@ public class ConversationRepository {
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> _saveResult = new MutableLiveData<>();
 
-    private String formatDateToISO(Date date) {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return isoFormat.format(date);
-    }
-
     public void saveConversation(Conversation conversation, Context context) {
         new Thread(() -> {
             try {
@@ -75,7 +69,7 @@ public class ConversationRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String respBody = response.body() != null ? response.body().string() : "";
+                String respBody = response.body().string();
                 if (response.isSuccessful()) {
                     _saveResult.postValue(true);
                     loadConversations(context);
@@ -136,11 +130,10 @@ public class ConversationRepository {
 
                         Date timestamp = null;
                         String timestampStr = object.optString("timestamp", null);
-                        if (timestampStr != null && !timestampStr.isEmpty()) {
+                        if (!timestampStr.isEmpty()) {
                             try {
                                 timestamp = isoFormat.parse(timestampStr);
                             } catch (Exception ignore) {
-                                timestamp = null;
                             }
                         }
                         if (timestamp == null) timestamp = new Date();
@@ -182,7 +175,7 @@ public class ConversationRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
                     loadConversations(context);
@@ -201,10 +194,6 @@ public class ConversationRepository {
 
     public LiveData<String> getErrorMessage() {
         return _errorMessage;
-    }
-
-    public LiveData<Boolean> getSaveResult() {
-        return _saveResult;
     }
 }
 

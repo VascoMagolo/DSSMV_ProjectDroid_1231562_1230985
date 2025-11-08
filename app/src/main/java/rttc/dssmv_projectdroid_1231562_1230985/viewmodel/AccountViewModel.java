@@ -15,9 +15,9 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
 public class AccountViewModel extends AndroidViewModel {
 
-    private AccountRepository accountRepository;
-    private MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final AccountRepository accountRepository;
+    private final MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public AccountViewModel(@NonNull Application application) {
         super(application);
