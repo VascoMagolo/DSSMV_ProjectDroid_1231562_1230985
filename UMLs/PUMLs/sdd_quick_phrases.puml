@@ -1,0 +1,88 @@
+@startuml SSD: Quick Phrases
+title SSD: Quick Phrases (Load -> Translate -> TTS)
+
+skinparam defaultFontName "Inter"
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam participant {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+skinparam sequence {
+    ArrowColor #333333
+    ActorBorderColor #000000
+    LifeLineBorderColor #C0C0C0
+}
+
+participant "User" as User
+
+box "Application Layer" #F8F8F8
+    participant "PhrasesFragment (View)" as View
+    participant "PhraseViewModel" as VM
+    participant "TTS Engine (Android)" as TTS
+end box
+
+box "Repository Layer" #F8F8F8
+    participant "PhraseRepository" as PR
+    participant "TranslationRepository" as TR
+end box
+
+box "External Systems" #F8F8F8
+    participant "Supabase (DB)" as DB
+    participant "Translation API" as API
+end box
+
+alt Scenario: User loads/browses phrases
+
+    User -> View : Open screen (or select from "Phrases in:" spinner)
+    activate View
+    View -> VM : loadPhrases(selectedSourceLang)
+    activate VM
+    VM -> PR : loadPhrasesByLanguage(lang)
+    activate PR
+    PR -> DB : GET /rest/v1/generic_phrases?language=eq.{lang}
+    DB --> PR : 200 OK { [ ...list of phrases... ] }
+    PR -> VM : _phrases.postValue(list)
+    deactivate PR
+
+    VM -> View : (Observer fires) phrases.observe(...)
+    deactivate VM
+    View -> View : adapter.updatePhrases(list)
+    View -> User : Display list of phrases
+    deactivate View
+
+else Scenario: User translates a phrase
+
+    User -> View : Tap phrase "Hello"
+    activate View
+    View -> View : cardTranslation.setVisibility(VISIBLE)
+    View -> VM : translatePhrase("Hello", targetLang)
+    activate VM
+    VM -> TR : detectAndTranslate("Hello", targetLang)
+    activate TR
+    TR -> API : HTTP POST /translate
+    API --> TR : 200 OK { translation: "Olá" }
+    TR --> VM : onSuccess("Olá", "en")
+    deactivate TR
+
+    VM -> View : translatedText.postValue("Olá")
+    deactivate VM
+
+    View -> View : textTranslatedPhrase.setText("Olá")
+    deactivate View
+
+    alt User taps "Speak"
+        User -> View : Press "Speak" button
+        activate View
+        View -> TTS : tts.speak("Olá")
+        activate TTS
+        TTS -> User : Audio Output
+        deactivate TTS
+        deactivate View
+    end
+
+end
+
+@enduml

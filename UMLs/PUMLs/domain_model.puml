@@ -1,0 +1,49 @@
+@startuml DomainModel
+skinparam defaultFontName "Inter"
+skinparam actorBorderColor #000000
+skinparam actorBackgroundColor #EFEFEF
+skinparam useCaseBorderColor #000000
+skinparam useCaseBackgroundColor #FFFFFF
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam arrow {
+    Color #333333
+    Thickness 1.5
+}
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+    ArrowColor #333333
+}
+
+package "Domain" {
+  class User {
+    +String id
+    +String name
+    +String email
+    +String password
+    +String preferredLanguage
+  }
+
+  class Conversation {
+    +String id
+    +String userId
+    +String originalText
+    +String translatedText
+    +String sourceLanguage
+    +String targetLanguage
+    +Date timestamp
+  }
+
+  class GenericPhrase {
+    +String id
+    +String category
+    +String text
+    +String language
+  }
+
+  User "1" -- "0.*" Conversation : owns
+}
+@enduml

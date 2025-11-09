@@ -1,0 +1,112 @@
+@startuml SSD: Login and Register
+title SSD: Login & Register (Custom REST -> SharedPreferences)
+
+skinparam defaultFontName "Inter"
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam participant {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+skinparam sequence {
+    ArrowColor #333333
+    ActorBorderColor #000000
+    LifeLineBorderColor #C0C0C0
+}
+
+participant "User" as User
+
+box "View Layer" #F8F8F8
+    participant "LoginActivity" as LoginView
+    participant "RegisterActivity" as RegisterView
+end box
+
+box "ViewModel Layer" #F8F8F8
+    participant "LoginViewModel" as LVM
+    participant "RegisterViewModel" as RVM
+end box
+
+box "Repository Layer" #F8F8F8
+    participant "AuthRepository" as AR
+    participant "SessionManager (SharedPrefs)" as SM
+end box
+
+box "External Systems" #F8F8F8
+    participant "Supabase (DB)" as DB
+end box
+
+
+== Registration Flow ==
+User -> RegisterView : Fill form (name, email, pass, prefLang) & Press "Create"
+RegisterView -> RVM : register(name, email, pass, confirmPass, prefLang)
+activate RVM
+RVM -> RVM : validateInput()
+opt validation succeeds
+    RVM -> RegisterView : post isLoading(true)
+    RVM -> AR : RegisterUser(name, email, pass, prefLang, callback)
+    activate AR
+    AR -> DB : POST /rest/v1/users \n{name, email, pass, prefLang}
+    DB --> AR : 201 Created
+    AR -> RVM : callback.onSuccess()
+    deactivate AR
+
+    RVM -> RegisterView : post isLoading(false)
+    RVM -> RegisterView : post navigateToLogin(true)
+    deactivate RVM
+
+    RegisterView -> User : Show "Account Created" Toast
+    RegisterView -> LoginView : startActivity()
+    RegisterView -> RegisterView : finish()
+else validation fails
+    RVM -> RegisterView : post errorMessage(...)
+    deactivate RVM
+    RegisterView -> User : Show Error Toast
+end
+
+
+== Login Flow ==
+User -> LoginView : Fill form (email, pass) & Press "Login"
+LoginView -> LVM : login(context, email, pass)
+activate LVM
+LVM -> LVM : validateInput()
+opt validation succeeds
+    LVM -> LoginView : post isLoading(true)
+    LVM -> AR : login(context, email, pass, callback)
+    activate AR
+    AR -> DB : GET /rest/v1/users?email=eq.{email}&password=eq.{pass}
+    DB --> AR : 200 OK { [ ...user_array... ] }
+
+    alt user array is not empty
+        AR -> SM : saveUser(User user)
+        activate SM
+        rnote over SM : Writes user JSON to SharedPreferences
+        SM --> AR : (return)
+        deactivate SM
+        AR -> LVM : callback.onSuccess(User user)
+    else user array is empty
+        AR -> LVM : callback.onError(AuthException)
+    end
+    deactivate AR
+
+    alt login success
+        LVM -> LoginView : post isLoading(false)
+        LVM -> LoginView : post navigateToHome(true)
+        deactivate LVM
+        LoginView -> User : Show "Login Successful" Toast
+        LoginView -> User : Navigate to MainActivity
+        LoginView -> LoginView : finish()
+    else login fails
+        LVM -> LoginView : post isLoading(false)
+        LVM -> LoginView : post errorMessage(...)
+        deactivate LVM
+        LoginView -> User : Show Error Toast
+    end
+else validation fails
+    LVM -> LoginView : post errorMessage(...)
+    deactivate LVM
+    LoginView -> User : Show Error Toast
+end
+
+@enduml

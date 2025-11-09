@@ -1,0 +1,88 @@
+@startuml Use Case Diagram - Translator
+
+skinparam defaultFontName "Inter"
+skinparam actorBorderColor #000000
+skinparam actorBackgroundColor #EFEFEF
+skinparam useCaseBorderColor #000000
+skinparam useCaseBackgroundColor #FFFFFF
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam arrow {
+    Color #333333
+    Thickness 1.5
+}
+skinparam note {
+    BackgroundColor #FFFFE0
+    BorderColor #A0A0A0
+}
+
+left to right direction
+
+actor "Guest" as Guest
+actor "Registered User" as RegisteredUser
+
+package "External Systems" {
+    actor "Supabase (DB)" as Supabase
+    actor "Translation API" as TranslationAPI
+    actor "OCR API" as OCRAPI
+}
+
+package "Core Use Cases" {
+    usecase UC_TranslateVoice as "Translate by Voice
+    (STT -> Translate -> TTS)"
+    usecase UC_TranslateImage as "Translate Image
+    (OCR -> Translate)"
+    usecase UC_BrowsePhrases as "Browse and Translate Phrases"
+}
+
+package "Account Management" {
+    usecase UC_Login as "Login"
+    usecase UC_Register as "Register"
+    usecase UC_Logout as "Logout"
+    usecase UC_DeleteAccount as "Delete Account"
+}
+
+package "History" {
+    usecase UC_ViewHistory as "View History"
+    usecase UC_SaveTranslation as "Save Translation"
+}
+
+Guest --> UC_TranslateVoice
+Guest --> UC_TranslateImage
+Guest --> UC_BrowsePhrases
+
+Guest <|-- RegisteredUser
+
+RegisteredUser --> UC_Login
+RegisteredUser --> UC_Register
+RegisteredUser --> UC_Logout
+RegisteredUser --> UC_DeleteAccount
+RegisteredUser --> UC_ViewHistory
+
+
+RegisteredUser --> UC_SaveTranslation
+
+
+
+UC_SaveTranslation <.. UC_TranslateVoice : <<extends>>
+UC_SaveTranslation <.. UC_TranslateImage : <<extends>>
+UC_SaveTranslation <.. UC_BrowsePhrases : <<extends>>
+
+UC_Login ..> Supabase : (authenticates)
+UC_Register ..> Supabase : (creates user)
+UC_DeleteAccount ..> Supabase : (deletes user)
+UC_ViewHistory ..> Supabase : (reads)
+UC_SaveTranslation ..> Supabase : (writes)
+
+UC_BrowsePhrases ..> Supabase : (reads phrases)
+UC_BrowsePhrases ..> TranslationAPI : (translates)
+
+UC_TranslateImage ..> OCRAPI : (extracts text)
+UC_TranslateImage ..> TranslationAPI : (translates)
+
+UC_TranslateVoice ..> TranslationAPI : (detects and translates)
+
+
+@enduml
