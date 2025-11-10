@@ -168,9 +168,9 @@ public class ConversationFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permissão concedida. Pressione o microfone.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Permission granted. Press Microphone.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "Permissão de microfone negada.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Microphone permission negated.", Toast.LENGTH_SHORT).show();
             }
         }
     }
