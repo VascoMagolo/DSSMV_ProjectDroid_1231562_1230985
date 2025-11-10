@@ -1,0 +1,88 @@
+@startuml SSD: Voice Translation
+title SSD: Voice Translation (STT -> Translate -> Save -> TTS)
+
+skinparam defaultFontName "Inter"
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam participant {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+skinparam sequence {
+    ArrowColor #333333
+    ActorBorderColor #000000
+    LifeLineBorderColor #C0C0C0
+}
+
+participant "User" as User
+
+box "Application Layer" #F8F8F8
+    participant "ConversationFragment (View)" as View
+    participant "ConversationViewModel" as VM
+    participant "ConversationHistoryViewModel" as HistoryVM
+    participant "TTS Engine (Android)" as TTS
+end box
+
+box "Repository Layer" #F8F8F8
+    participant "TranslationRepository" as TR
+    participant "ConversationRepository" as CR
+end box
+
+box "External Systems" #F8F8F8
+    participant "Translation API" as API
+    participant "Supabase (DB)" as DB
+end box
+
+alt Scenario: User speaks to translate
+
+    User -> View : Press "Start Listening"
+    View -> VM : startListening(targetLang)
+    activate VM
+
+    rnote over VM : Triggers Android SpeechRecognizer (STT)\nOn STT success: onSpeechResult("...")
+
+    VM -> View : post recognizedText (ex: "Hello")
+    View -> View : updateRecognizedText()
+
+    VM -> TR : detectAndTranslate("Hello", targetLang)
+    activate TR
+    TR -> API : HTTP POST /translate
+    API --> TR : 200 OK { translation: "Olá", detectedLang: "en" }
+    TR --> VM : onSuccess("Olá", "en")
+    deactivate TR
+
+    VM -> View : post translatedText ("Olá")
+    VM -> View : post originalLanguage ("en")
+    deactivate VM
+
+    View -> View : updateTranslatedText()
+    View -> View : updateOriginalLang()
+
+    View -> View : tryToSaveConversation()
+
+    opt If user is registered and all data is present
+        View -> HistoryVM : saveConversation(Conversation)
+        activate HistoryVM
+        HistoryVM -> CR : saveConversation(Conversation, context)
+        activate CR
+        CR -> DB : POST /rest/v1/conversations
+        DB --> CR : 201 Created
+        CR --> HistoryVM : postValue(true)
+        deactivate CR
+        HistoryVM -> View : (Updates LiveData, not shown)
+        deactivate HistoryVM
+    end
+
+else Scenario: User plays the translation
+
+    User -> View : Press "Play Translation"
+    View -> TTS : tts.speak(currentTranslatedText)
+    activate TTS
+    TTS -> User : Audio Output
+    deactivate TTS
+
+end
+
+@enduml

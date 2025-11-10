@@ -1,0 +1,80 @@
+@startuml SSD: Image (OCR) Translation
+title SSD: Image Translation (OCR -> Translate -> Save)
+
+skinparam defaultFontName "Inter"
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam participant {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+}
+skinparam sequence {
+    ArrowColor #333333
+    ActorBorderColor #000000
+    LifeLineBorderColor #C0C0C0
+}
+
+participant "User" as User
+
+box "Application Layer" #F8F8F8
+    participant "ImageFragment (View)" as View
+    participant "ImageViewModel" as VM
+    participant "ConversationHistoryViewModel" as HistoryVM
+    participant "Android Camera App" as CameraApp
+end box
+
+box "Repository Layer" #F8F8F8
+    participant "ImageRepository" as IR
+    participant "TranslationRepository" as TR
+    participant "ConversationRepository" as CR
+end box
+
+box "External Systems" #F8F8F8
+    participant "OCR API" as OCR
+    participant "Translation API" as API
+    participant "Supabase (DB)" as DB
+end box
+
+User -> View : Tap "Take Photo"
+View -> CameraApp : Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+CameraApp --> View : onActivityResult(URI)
+
+View -> View : Convert URI to imageBytes
+View -> VM : processImage(imageBytes, targetLang)
+activate VM
+VM -> View : post isLoading(true)
+
+VM -> IR : extractTextFromImage(imageBytes)
+activate IR
+IR -> OCR : HTTP POST /results (multipart)
+OCR --> IR : 200 OK { text: "Hello" }
+IR --> VM : onSuccess("Hello")
+deactivate IR
+
+VM -> View : post extractedText("Hello")
+VM -> TR : detectAndTranslate("Hello", targetLang)
+activate TR
+TR -> API : HTTP POST /translate
+API --> TR : 200 OK { translation: "Olá", detectedLang: "en" }
+TR --> VM : onSuccess("Olá", "en")
+deactivate TR
+
+VM -> View : post translatedText("Olá")
+VM -> View : post isLoading(false)
+deactivate VM
+
+View -> User : display "Hello" and "Olá"
+
+View -> HistoryVM : saveConversation(Conversation{...})
+activate HistoryVM
+HistoryVM -> CR : saveConversation(Conversation, context)
+activate CR
+CR -> DB : POST /rest/v1/conversations
+DB --> CR : 201 Created
+CR --> HistoryVM : postValue(true)
+deactivate CR
+deactivate HistoryVM
+
+@enduml

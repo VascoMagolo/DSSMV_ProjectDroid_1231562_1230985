@@ -1,5 +1,4 @@
 package rttc.dssmv_projectdroid_1231562_1230985.view.fragments;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -7,13 +6,11 @@ import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -21,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.Locale;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationHistoryViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationViewModel;
 
@@ -36,7 +35,11 @@ public class ConversationFragment extends Fragment {
     private String pendingTranslatedText = null;
     private String pendingDetectedLanguage = null;
     private TextView txtRecognized, txtTranslated, txtOriginalLang;
-    private Spinner spinner;
+    private AutoCompleteTextView autoCompleteTargetLanguage;
+    private SessionManager sessionManager;
+    private String targetLang = "en";
+    private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,6 +47,8 @@ public class ConversationFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(ConversationViewModel.class);
         historyViewModel = new ViewModelProvider(this).get(ConversationHistoryViewModel.class);
+        sessionManager = new SessionManager(requireContext());
+
         return inflater.inflate(R.layout.fragment_conversation, container, false);
     }
 
@@ -51,21 +56,19 @@ public class ConversationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         Button btnSpeak = view.findViewById(R.id.btnStartListening);
         Button btnPlay = view.findViewById(R.id.btnPlayTranslation);
-        spinner = view.findViewById(R.id.spinnerTargetLanguage);
-
+        autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
 
         txtRecognized = view.findViewById(R.id.txtRecognized);
         txtTranslated = view.findViewById(R.id.txtTranslated);
         txtOriginalLang = view.findViewById(R.id.txtOriginalLang);
 
         setupTts();
-        setupSpinner(spinner);
+        setupTargetLanguageMenu();
         setupObservers();
 
         btnSpeak.setOnClickListener(v -> {
             if (checkAudioPermission()) {
-                String currentTargetLanguage = (String) spinner.getTag();
-                viewModel.startListening(currentTargetLanguage);
+                viewModel.startListening(targetLang);
             }
         });
 
@@ -84,25 +87,36 @@ public class ConversationFragment extends Fragment {
             }
         });
     }
-
-    private void setupSpinner(Spinner spinner) {
-        String[] languages = {"English", "Português", "Español", "Français", "日本語", "中文", "Deutsch"};
-        String[] languageCodes = {"en", "pt", "es", "fr", "ja", "zh", "de"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_item, languages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        spinner.setTag(languageCodes[0]);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner.setTag(languageCodes[position]);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+    private void setupTargetLanguageMenu() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                languages
+        );
+        autoCompleteTargetLanguage.setAdapter(adapter);
+        User user = sessionManager.getUser();
+        String preferredLangCode = "en";
+        if (user != null && user.getPreferredLanguage() != null) {
+            preferredLangCode = user.getPreferredLanguage();
+        }
+        String preferredLangName = getLanguageNameFromCode(preferredLangCode);
+        autoCompleteTargetLanguage.setText(preferredLangName, false);
+        targetLang = preferredLangCode;
+        autoCompleteTargetLanguage.setOnItemClickListener((parent, view, position, id) -> {
+            targetLang = languageCodes[position];
         });
+    }
+    private String getLanguageNameFromCode(String langCode) {
+        if (langCode == null) {
+            return languages[1];
+        }
+        String trimmedLangCode = langCode.trim();
+        for (int i = 0; i < languageCodes.length; i++) {
+            if (languageCodes[i].equalsIgnoreCase(trimmedLangCode)) {
+                return languages[i];
+            }
+        }
+        return languages[1];
     }
 
     private void setupObservers() {
@@ -121,15 +135,19 @@ public class ConversationFragment extends Fragment {
 
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {
             if (lang != null && !lang.isEmpty()) {
-                txtOriginalLang.setText("Detected: " + lang.toUpperCase());
+                txtOriginalLang.setText("Detetado: " + lang.toUpperCase());
                 pendingDetectedLanguage = lang;
                 tryToSaveConversation();
+                if (ttsReady) {
+                    Locale locale = new Locale(lang);
+                    tts.setLanguage(locale);
+                }
             }
         });
 
         viewModel.statusMessage.observe(getViewLifecycleOwner(), message -> {
             txtRecognized.setText(message);
-            // Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -150,12 +168,13 @@ public class ConversationFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permissão concedida. Pressione o microfone.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Permission granted. Press Microphone.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "Permissões de microfone negadas.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Microphone permission negated.", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     private void tryToSaveConversation() {
         if (pendingOriginalText != null &&
                 pendingTranslatedText != null &&
@@ -165,9 +184,6 @@ public class ConversationFragment extends Fragment {
             if (sourceLang.isEmpty()) {
                 sourceLang = "auto";
             }
-
-            Object tag = spinner != null ? spinner.getTag() : null;
-            String targetLang = tag instanceof String ? (String) tag : "en";
 
             try {
                 Conversation conversation = new Conversation(
@@ -183,12 +199,12 @@ public class ConversationFragment extends Fragment {
                 Toast.makeText(getContext(), "Error saving conversation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
-
             pendingOriginalText = null;
             pendingTranslatedText = null;
             pendingDetectedLanguage = null;
         }
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

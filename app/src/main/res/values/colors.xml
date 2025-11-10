@@ -22,4 +22,6 @@
     <color name="nav_icon_checked">@color/primary</color>
     <color name="nav_icon_unchecked">@color/textSecondary</color>
     <color name="nav_background">@color/background</color>
+    <color name="favorite_IconNotFav">#000000</color>
+    <color name="favorite_IconFav">#FFD166</color>
 </resources>

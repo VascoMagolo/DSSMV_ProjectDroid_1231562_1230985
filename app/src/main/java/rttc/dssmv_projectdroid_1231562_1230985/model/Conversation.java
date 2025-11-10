@@ -10,6 +10,15 @@ public class Conversation {
     private String sourceLanguage;
     private String targetLanguage;
     private Date timestamp;
+    private  Boolean isFavorite;
+
+    public Boolean getFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
 
     public Conversation() {}
 

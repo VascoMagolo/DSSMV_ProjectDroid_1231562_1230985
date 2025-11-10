@@ -1,0 +1,240 @@
+@startuml ClassDiagram
+skinparam classAttributeIconSize 0
+skinparam defaultFontName "Inter"
+skinparam package {
+    BackgroundColor #F8F8F8
+    BorderColor #A0A0A0
+}
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+    ArrowColor #333333
+}
+skinparam arrow {
+    Color #333333
+    Thickness 1.3
+}
+
+package model {
+  class User {
+    +String id
+    +String name
+    +String email
+    +String password
+    +String preferredLanguage
+  }
+
+  class Conversation {
+    +String id
+    +String userId
+    +String originalText
+    +String translatedText
+    +String sourceLanguage
+    +String targetLanguage
+    +Date timestamp
+  }
+
+  class GenericPhrase {
+    +String id
+    +String category
+    +String text
+    +String language
+  }
+}
+
+package utils {
+  class SessionManager {
+    +void saveUser(User user)
+    +User getUser()
+    +boolean isLoggedIn()
+    +void clearSession()
+  }
+
+  class AuthUiHelper {
+    +static void setupLoginObservers(...)
+    +static void setupRegisterObservers(...)
+  }
+}
+
+package repository {
+  class AuthRepository {
+    +void registerUser(String name, String email, String pass, String prefLang, RegisterCallback)
+    +void login(Context context, String email, String pass, LoginCallback)
+  }
+
+  interface RegisterCallback {
+    +void onSuccess()
+    +void onError(Exception e)
+  }
+
+  interface LoginCallback {
+    +void onSuccess(User user)
+    +void onError(Exception e)
+  }
+
+  class AccountRepository {
+    +void deleteAccount(Context context, String userId, DeleteCallback)
+    +void updateProfile(User user)
+  }
+
+  interface DeleteCallback {
+    +void onSuccess()
+    +void onError(Exception e)
+  }
+
+  class ConversationRepository {
+    +LiveData<List<Conversation>> getConversations()
+    +void loadConversations(Context context)
+    +void saveConversation(Conversation c, Context context)
+  }
+
+  class PhraseRepository {
+    +LiveData<List<GenericPhrase>> getPhrases()
+    +void loadPhrasesByLanguage(String lang)
+  }
+
+  class ImageRepository {
+    +void extractTextFromImage(byte[] imageBytes, OCRCallback)
+  }
+
+  interface OCRCallback {
+    +void onSuccess(String extractedText)
+    +void onError(Exception e)
+  }
+
+  class TranslationRepository {
+    +void detectAndTranslate(String text, String targetLang, TranslationCallback)
+  }
+
+  interface TranslationCallback {
+    +void onSuccess(String translatedText, String detectedLang)
+    +void onError(Exception e)
+  }
+
+  AuthRepository ..> RegisterCallback
+  AuthRepository ..> LoginCallback
+  AccountRepository ..> DeleteCallback
+  ImageRepository ..> OCRCallback
+  TranslationRepository ..> TranslationCallback
+
+  AuthRepository ..> utils.SessionManager : uses
+  AccountRepository ..> utils.SessionManager : uses
+  ConversationRepository ..> utils.SessionManager : uses
+  PhraseRepository ..> exceptions.ApiException : throws
+  TranslationRepository ..> exceptions.NetworkException : throws
+  ImageRepository ..> exceptions.ApiException : throws
+}
+
+package viewmodel {
+  class LoginViewModel {
+    +LiveData<Boolean> navigateToHome
+    +LiveData<String> errorMessage
+    +void login(Context context, String email, String pass)
+  }
+
+  class RegisterViewModel {
+    +LiveData<Boolean> navigateToLogin
+    +void register(String name, String email, String pass, String confirmPass, String prefLang)
+  }
+
+  class AccountViewModel {
+    +LiveData<Boolean> deleteSuccess
+    +void deleteUserAccount(Context context)
+  }
+
+  class ConversationViewModel {
+    +LiveData<String> recognizedText
+    +LiveData<String> translatedText
+    +void startListening(String targetLang)
+  }
+
+  class ImageViewModel {
+    +LiveData<String> extractedText
+    +LiveData<String> translatedText
+    +void processImage(byte[] imageBytes, String targetLang)
+  }
+
+  class PhraseViewModel {
+    +LiveData<List<GenericPhrase>> phrases
+    +void loadPhrases(String language)
+    +LiveData<String> translatedText
+    +void translatePhrase(String phrase, String target)
+  }
+
+  class ConversationHistoryViewModel {
+    +LiveData<List<Conversation>> conversations
+    +void loadHistory(Context context)
+  }
+
+  ' --- ViewModel -> Repository ---
+  LoginViewModel ..> repository.AuthRepository
+  RegisterViewModel ..> repository.AuthRepository
+  AccountViewModel ..> repository.AccountRepository
+  ConversationViewModel ..> repository.TranslationRepository
+  ConversationViewModel ..> repository.ConversationRepository
+  ImageViewModel ..> repository.ImageRepository
+  ImageViewModel ..> repository.TranslationRepository
+  PhraseViewModel ..> repository.PhraseRepository
+  PhraseViewModel ..> repository.TranslationRepository
+  ConversationHistoryViewModel ..> repository.ConversationRepository
+}
+
+package view {
+  folder "activities" {
+    class LoginActivity
+    class RegisterActivity
+    class MainActivity
+    class ConversationHistoryActivity
+  }
+
+  folder "fragments" {
+    class ConversationFragment
+    class ImageFragment
+    class PhrasesFragment
+    class AccountFragment
+  }
+
+  package adapters {
+    class ConversationAdapter
+    class PhraseAdapter
+  }
+
+  activities.LoginActivity ..> viewmodel.LoginViewModel
+  activities.RegisterActivity ..> viewmodel.RegisterViewModel
+  activities.ConversationHistoryActivity ..> viewmodel.ConversationHistoryViewModel
+  fragments.ConversationFragment ..> viewmodel.ConversationViewModel
+  fragments.ImageFragment ..> viewmodel.ImageViewModel
+  fragments.PhrasesFragment ..> viewmodel.PhraseViewModel
+  fragments.AccountFragment ..> viewmodel.AccountViewModel
+
+  activities.MainActivity ..> fragments.ConversationFragment : hosts
+  activities.MainActivity ..> fragments.ImageFragment : hosts
+  activities.MainActivity ..> fragments.PhrasesFragment : hosts
+  activities.MainActivity ..> fragments.AccountFragment : hosts
+
+  adapters.PhraseAdapter ..> model.GenericPhrase
+  adapters.ConversationAdapter ..> model.Conversation
+
+  activities.LoginActivity ..> utils.AuthUiHelper : uses
+  activities.RegisterActivity ..> utils.AuthUiHelper : uses
+  activities.LoginActivity ..> utils.SessionManager : uses
+  activities.RegisterActivity ..> utils.SessionManager : uses
+  activities.MainActivity ..> utils.SessionManager : uses
+  fragments.AccountFragment ..> utils.SessionManager : uses
+}
+
+
+
+package exceptions {
+  class ApiException
+  class AuthException
+  class NetworkException
+}
+
+repository.AuthRepository ..> exceptions.AuthException
+repository.AuthRepository ..> exceptions.ApiException
+repository.AuthRepository ..> exceptions.NetworkException
+repository.AccountRepository ..> exceptions.NetworkException
+repository.ImageRepository ..> exceptions.ApiException
+
+@enduml

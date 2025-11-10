@@ -42,13 +42,14 @@ public class AuthRepository {
                 .build();
     }
 
-    public void RegisterUser(String name, String email, String password, RegisterCallback callback) {
+    public void RegisterUser(String name, String email, String password, String preferredLanguage, RegisterCallback callback) {
         new Thread(() -> {
             try {
                 JSONObject userJson = new JSONObject();
                 userJson.put("name", name);
                 userJson.put("email", email);
                 userJson.put("password", password);
+                userJson.put("preferred_language", preferredLanguage);
 
                 RequestBody body = RequestBody.create(
                         userJson.toString(),
@@ -65,7 +66,7 @@ public class AuthRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
                     callback.onSuccess();
@@ -117,14 +118,14 @@ public class AuthRepository {
                                 userObj.optString("email"),
                                 null,
                                 userObj.optString("id")
+                                ,userObj.optString("preferred_language")
                         );
 
                         SessionManager session = new SessionManager(context);
                         session.saveUser(user);
                         Log.d("LOGIN_DEBUG", "NAME=" + userObj.optString("name") + " | ID=" + userObj.optString("id"));
-                        callback.onSuccess(user); // Envia o utilizador de volta
+                        callback.onSuccess(user);
                     } else {
-                        // Resposta 200 (OK) mas array vazio = email/pass errada
                         callback.onError(new AuthException("Invalid email or password."));
                     }
                 } else {

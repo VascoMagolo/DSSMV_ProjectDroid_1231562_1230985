@@ -14,7 +14,6 @@ import java.util.List;
 public class PhraseViewModel extends AndroidViewModel {
     private final PhraseRepository phraseRepository;
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
-    public LiveData<Boolean> isLoading = _isLoading;
     private final MutableLiveData<String> _translatedText = new MutableLiveData<>();
     public LiveData<String> translatedText = _translatedText;
 

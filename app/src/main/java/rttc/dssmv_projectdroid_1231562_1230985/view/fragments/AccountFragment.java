@@ -23,6 +23,9 @@ import rttc.dssmv_projectdroid_1231562_1230985.view.ConversationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class AccountFragment extends Fragment {
     private AccountViewModel viewModel;
     private SessionManager sessionManager;
@@ -48,14 +51,16 @@ public class AccountFragment extends Fragment {
         MaterialButton btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
 
         User user = sessionManager.getUser();
+        Date currentTime = Calendar.getInstance().getTime();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentTime);
         if (user != null) {
             String displayName = user.getName();
             if (displayName == null || displayName.isEmpty()) {
                 displayName = user.getEmail();
             }
-            textGreeting.setText("Hello, " + displayName + "! 👋");
+            textGreeting.setText(getTimeofTheDayGreeting(displayName));
         }
-
         btnHistory.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ConversationHistoryActivity.class);
             startActivity(intent);
@@ -107,5 +112,20 @@ public class AccountFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         getActivity().finish();
+    }
+
+    private String getTimeofTheDayGreeting(String displayName) {
+        Date currentTime = Calendar.getInstance().getTime();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentTime);
+
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        if (hour >= 5 && hour < 12) {
+            return "Good Morning, " + displayName + "! \uD83D\uDC4B";
+        } else if (hour >= 12 && hour < 18) {
+            return "Good Afternoon, " + displayName + "! \uD83D\uDC4B";
+        } else {
+            return "Good Evening, " + displayName + "! \uD83D\uDC4B";
+        }
     }
 }

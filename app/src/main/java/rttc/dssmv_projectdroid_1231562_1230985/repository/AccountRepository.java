@@ -50,7 +50,7 @@ public class AccountRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "No error body";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
                     SessionManager session = new SessionManager(context);

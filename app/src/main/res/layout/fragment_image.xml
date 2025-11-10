@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="16dp"
-              android:gravity="center_horizontal"
-              android:background="?attr/colorSurface">
-    <LinearLayout
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal"
+        android:background="?attr/colorSurface">
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/menuTargetLanguage"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="20dp"
+            android:hint="Translate to:">
 
-        <TextView
-                android:layout_width="wrap_content"
+        <AutoCompleteTextView
+                android:id="@+id/autoCompleteTargetLanguage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Translate to:"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginEnd="8dp" />
+                android:inputType="none"
+                tools:ignore="LabelFor" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <Spinner
-                android:id="@+id/spinner_target_lang"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/language_list"
-                android:spinnerMode="dropdown" />
-    </LinearLayout>
     <ImageView
             android:id="@+id/img_preview"
             android:layout_width="250dp"
@@ -36,37 +33,78 @@
             android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:background="?attr/colorPrimaryContainer"
-            android:contentDescription="@string/image_preview" />
+            android:background="?attr/colorSurfaceContainerHigh"
+            android:contentDescription="@string/image_preview"
+            android:clipToOutline="true" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Take Photo 📸"
-            android:icon="@drawable/baseline_camera_alt_24"
-            app:iconGravity="textStart"
-            android:layout_marginBottom="20dp"/>
+            android:text="Take Photo"
+            android:textAllCaps="false"
+            app:icon="@drawable/baseline_camera_alt_24"
+    app:iconGravity="textStart"
+    android:layout_marginBottom="20dp"/>
 
-    <TextView
-            android:id="@+id/text_original"
+    <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Extracted Text:"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"
-            android:background="?attr/colorSurfaceVariant"
-            android:padding="8dp" />
+            app:cardCornerRadius="16dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer">
 
-    <TextView
-            android:id="@+id/text_translated_from_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Translated Text:"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            android:background="?attr/colorSurfaceVariant"
-            android:padding="8dp" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+            <TextView
+                    android:id="@+id/label_original"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Extracted Text:"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/text_original"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Extracted Text"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginBottom="12dp"
+                    android:minLines="1" />
+
+            <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"/>
+
+            <TextView
+                    android:id="@+id/label_translated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Translation:"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/text_translated_from_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Translated Text"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:minLines="1" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

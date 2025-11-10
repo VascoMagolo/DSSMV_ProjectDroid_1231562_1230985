@@ -12,10 +12,9 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +35,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
+import rttc.dssmv_projectdroid_1231562_1230985.model.User;
+import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ImageViewModel;
 
 public class ImageFragment extends Fragment {
@@ -46,13 +47,14 @@ public class ImageFragment extends Fragment {
     private ImageView imgPreview;
     private TextView txtOriginal;
     private TextView txtTranslated;
-    private Spinner spinnerTargetLang;
-    private MaterialButton btnTakePhoto;
+    private AutoCompleteTextView autoCompleteTargetLanguage;
 
     private String targetLang = "en";
     private Uri photoUri;
-
     private ImageViewModel viewModel;
+    private SessionManager sessionManager;
+    private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
     @Nullable
     @Override
@@ -62,12 +64,13 @@ public class ImageFragment extends Fragment {
         imgPreview = view.findViewById(R.id.img_preview);
         txtOriginal = view.findViewById(R.id.text_original);
         txtTranslated = view.findViewById(R.id.text_translated_from_image);
-        spinnerTargetLang = view.findViewById(R.id.spinner_target_lang);
-        btnTakePhoto = view.findViewById(R.id.btn_take_photo);
+        autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
+        MaterialButton btnTakePhoto = view.findViewById(R.id.btn_take_photo);
 
         viewModel = new ViewModelProvider(this).get(ImageViewModel.class);
+        sessionManager = new SessionManager(requireContext());
 
-        setupSpinner();
+        setupTargetLanguageMenu();
         setupObservers();
 
         btnTakePhoto.setOnClickListener(v -> openCamera());
@@ -75,28 +78,42 @@ public class ImageFragment extends Fragment {
         return view;
     }
 
-    private void setupSpinner() {
-        String[] languages = {"English (en)", "Português (pt)", "Español (es)", "Français (fr)", "Deutsch (de)", "日本語 (ja)", "中文 (zh)"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, languages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTargetLang.setAdapter(adapter);
+    private void setupTargetLanguageMenu() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                languages
+        );
+        autoCompleteTargetLanguage.setAdapter(adapter);
 
-        spinnerTargetLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = parent.getItemAtPosition(position).toString();
-                if (selected.contains("(en)")) targetLang = "en";
-                else if (selected.contains("(pt)")) targetLang = "pt";
-                else if (selected.contains("(es)")) targetLang = "es";
-                else if (selected.contains("(fr)")) targetLang = "fr";
-                else if (selected.contains("(de)")) targetLang = "de";
-                else if (selected.contains("(ja)")) targetLang = "ja";
-                else if (selected.contains("(zh)")) targetLang = "zh";
-            }
+        User user = sessionManager.getUser();
+        String preferredLangCode = "en";
+        if (user != null && user.getPreferredLanguage() != null) {
+            preferredLangCode = user.getPreferredLanguage();
+        }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+        String defaultLangName = getLanguageNameFromCode(preferredLangCode);
+        if (defaultLangName != null) {
+            autoCompleteTargetLanguage.setText(defaultLangName, false);
+            targetLang = preferredLangCode;
+        }
+
+        autoCompleteTargetLanguage.setOnItemClickListener((parent, view, position, id) -> {
+            targetLang = languageCodes[position];
         });
+    }
+
+    private String getLanguageNameFromCode(String langCode) {
+        if (langCode == null) {
+            return languages[0];
+        }
+        String trimmedLangCode = langCode.trim();
+        for (int i = 0; i < languageCodes.length; i++) {
+            if (languageCodes[i].equalsIgnoreCase(trimmedLangCode)) {
+                return languages[i];
+            }
+        }
+        return languages[0];
     }
 
     private void setupObservers() {

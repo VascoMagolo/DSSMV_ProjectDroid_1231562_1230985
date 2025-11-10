@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
         xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              app:cardCornerRadius="18dp"
-              app:cardElevation="3dp"
-              app:strokeColor="?attr/colorOutlineVariant"
-              app:strokeWidth="1dp"
-              android:padding="16dp">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="3dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:strokeWidth="1dp">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
     <TextView
             android:id="@+id/dialog_text_original"
@@ -69,7 +73,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Data:"
+                android:text="Date:"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface" />
 
@@ -84,16 +88,44 @@
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-            android:id="@+id/dialog_btn_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete Conversation"
-            android:textColor="?attr/colorOnError"
-            app:icon="@drawable/baseline_delete_forever_24"
-            app:iconTint="?attr/colorOnError"
-            app:backgroundTint="?attr/colorErrorContainer"
-            android:layout_gravity="center_horizontal"
-            style="@style/Widget.Material3.Button.TextButton" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical|start">
 
-</LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dialog_btn_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:textColor="?attr/colorError"
+                    app:icon="@drawable/baseline_delete_forever_24"
+                    app:iconTint="?attr/colorError"
+                    style="@style/Widget.Material3.Button.TextButton"/>
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dialog_btn_favorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_favorite"
+                    app:iconTint="?attr/colorOnSurfaceVariant"
+                    style="@style/Widget.Material3.Button.IconButton"/>
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dialog_btn_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_share"
+                    app:iconTint="?attr/colorOnSurfaceVariant"
+                    style="@style/Widget.Material3.Button.IconButton"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

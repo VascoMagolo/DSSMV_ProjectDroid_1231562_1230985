@@ -1,47 +1,69 @@
 package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.LiveData;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.net.SocketTimeoutException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 public class ConversationRepository {
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
-    private final MutableLiveData<List<Conversation>> _conversations = new MutableLiveData<>();
-    private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> _saveResult = new MutableLiveData<>();
-
-    private String formatDateToISO(Date date) {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return isoFormat.format(date);
+    public interface SaveCallback {
+        void onSuccess();
+        void onError(Exception e);
     }
 
-    public void saveConversation(Conversation conversation, Context context) {
+    public interface LoadCallback {
+        void onSuccess(List<Conversation> conversations);
+        void onError(Exception e);
+    }
+
+    public interface DeleteCallback {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
+    public interface FavoriteCallback {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
+    public ConversationRepository() {
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+    }
+
+    public void saveConversation(Conversation conversation, Context context, SaveCallback callback) {
         new Thread(() -> {
             try {
                 SessionManager session = new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
-                    _saveResult.postValue(false);
+                    callback.onSuccess();
                     return;
                 }
 
@@ -50,15 +72,16 @@ public class ConversationRepository {
                 Date ts = conversation.getTimestamp();
                 if (ts == null) {
                     ts = new Date();
-                    conversation.setTimestamp(ts);
                 }
 
                 JSONObject conversationBody = new JSONObject();
                 conversationBody.put("user_id", conversation.getUserId());
-                conversationBody.put("original_text", conversation.getOriginalText() != null ? conversation.getOriginalText() : "");
-                conversationBody.put("translated_text", conversation.getTranslatedText() != null ? conversation.getTranslatedText() : "");
-                conversationBody.put("source_language", conversation.getSourceLanguage() != null ? conversation.getSourceLanguage() : "auto");
-                conversationBody.put("target_language", conversation.getTargetLanguage() != null ? conversation.getTargetLanguage() : "en");
+                conversationBody.put("original_text", conversation.getOriginalText());
+                conversationBody.put("translated_text", conversation.getTranslatedText());
+                conversationBody.put("source_language", conversation.getSourceLanguage());
+                conversationBody.put("target_language", conversation.getTargetLanguage());
+                conversationBody.put("is_favorite", conversation.getFavorite());
+
                 SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
                 isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 conversationBody.put("timestamp", isoFormat.format(ts));
@@ -75,29 +98,33 @@ public class ConversationRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String respBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
+
                 if (response.isSuccessful()) {
-                    _saveResult.postValue(true);
-                    loadConversations(context);
+                    callback.onSuccess();
                 } else {
-                    _errorMessage.postValue("Failed to save conversation: " + response.code() + " - " + respBody);
-                    _saveResult.postValue(false);
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to save conversation: " + response.code()));
+                    }
                 }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
-                _errorMessage.postValue(e.getMessage());
-                _saveResult.postValue(false);
+                callback.onError(e);
             }
         }).start();
     }
 
-    public void loadConversations(Context context) {
+    public void loadConversations(Context context, LoadCallback callback) {
         new Thread(() -> {
             try {
                 SessionManager session = new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
-                    _conversations.postValue(new ArrayList<>());
+                    callback.onSuccess(new ArrayList<>());
                     return;
                 }
 
@@ -105,7 +132,7 @@ public class ConversationRepository {
                         .newBuilder()
                         .addQueryParameter("user_id", "eq." + user.getId())
                         .addQueryParameter("select", "*")
-                        .addQueryParameter("order", "timestamp.desc")
+                        .addQueryParameter("order", "is_favorite.desc,timestamp.desc")
                         .build();
 
                 Request request = new Request.Builder()
@@ -126,21 +153,28 @@ public class ConversationRepository {
 
                     for (int i = 0; i < conversationsArray.length(); i++) {
                         JSONObject object = conversationsArray.getJSONObject(i);
+
                         Conversation conversation = new Conversation();
-                        conversation.setId(object.optString("id", null));
+                        conversation.setId(object.optString("id", null)); // <-- O ID crucial
                         conversation.setUserId(object.optString("user_id", null));
                         conversation.setOriginalText(object.optString("original_text", ""));
                         conversation.setTranslatedText(object.optString("translated_text", ""));
                         conversation.setSourceLanguage(object.optString("source_language", "auto"));
                         conversation.setTargetLanguage(object.optString("target_language", "en"));
+                        conversation.setFavorite(object.optBoolean("is_favorite", false));
 
                         Date timestamp = null;
                         String timestampStr = object.optString("timestamp", null);
-                        if (timestampStr != null && !timestampStr.isEmpty()) {
+                        if (!timestampStr.isEmpty()) {
                             try {
-                                timestamp = isoFormat.parse(timestampStr);
+                                if (timestampStr.contains(".")) {
+                                    timestamp = isoFormat.parse(timestampStr);
+                                } else {
+                                    SimpleDateFormat noMillisFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.getDefault());
+                                    noMillisFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                    timestamp = noMillisFormat.parse(timestampStr);
+                                }
                             } catch (Exception ignore) {
-                                timestamp = null;
                             }
                         }
                         if (timestamp == null) timestamp = new Date();
@@ -148,28 +182,34 @@ public class ConversationRepository {
 
                         conversations.add(conversation);
                     }
-                    _conversations.postValue(conversations);
+                    callback.onSuccess(conversations);
                 } else {
-                    _errorMessage.postValue("Failed to load conversation: " + response.code() + " - " + responseBody);
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to load conversations: " + response.code()));
+                    }
                 }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
-                _errorMessage.postValue(e.getMessage());
+                callback.onError(e);
             }
         }).start();
     }
 
-    public void deleteConversation(Conversation conversation, Context context) {
+    public void deleteConversation(Conversation conversation, Context context, DeleteCallback callback) {
         new Thread(() -> {
-            try{
+            try {
                 SessionManager session = new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null || conversation.getId() == null) {
-                    _errorMessage.postValue("Cannot delete: User not logged in or conversation ID null");
+                    callback.onError(new ApiException("Cannot delete: User not logged in or conversation ID is null"));
                     return;
                 }
 
-                HttpUrl url =  Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/conversations"))
+                HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/conversations"))
                         .newBuilder()
                         .addQueryParameter("id", "eq." + conversation.getId())
                         .build();
@@ -182,29 +222,66 @@ public class ConversationRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
-                    loadConversations(context);
-                }else{
-                    _errorMessage.postValue("Failed to delete conversation: " + response.code() + " - " + responseBody);
+                    callback.onSuccess();
+                } else {
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to delete conversation: " + response.code()));
+                    }
                 }
-            }catch (Exception e){
-                _errorMessage.postValue("Error deleting conversation " + e.getMessage());
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
+            } catch (Exception e) {
+                callback.onError(e);
             }
         }).start();
     }
 
-    public LiveData<List<Conversation>> getConversations() {
-        return _conversations;
-    }
+    public void updateFavoriteStatus(String conversationId, boolean isFavorite, FavoriteCallback callback) {
+        new Thread(() -> {
+            try {
+                HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/conversations"))
+                        .newBuilder()
+                        .addQueryParameter("id", "eq." + conversationId)
+                        .build();
 
-    public LiveData<String> getErrorMessage() {
-        return _errorMessage;
-    }
+                JSONObject bodyJson = new JSONObject();
+                bodyJson.put("is_favorite", isFavorite);
+                RequestBody body = RequestBody.create(
+                        bodyJson.toString(),
+                        MediaType.parse("application/json")
+                );
 
-    public LiveData<Boolean> getSaveResult() {
-        return _saveResult;
+                Request request = new Request.Builder()
+                        .url(url)
+                        .patch(body)
+                        .addHeader("apikey", SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("Prefer", "return=minimal")
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to update favorite: " + response.code()));
+                    }
+                }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
+            } catch (Exception e) {
+                callback.onError(e);
+            }
+        }).start();
     }
 }
-
