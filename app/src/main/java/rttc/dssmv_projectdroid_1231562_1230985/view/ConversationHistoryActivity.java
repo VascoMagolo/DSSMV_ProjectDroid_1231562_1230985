@@ -50,7 +50,7 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         adapter.setOnConversationClickListener(this::showConversationDetailsDialog);
 
         setupObservers();
-        viewModel.loadConversation(this);
+        viewModel.loadConversations(this);
     }
 
     private void setupObservers() {
@@ -75,8 +75,6 @@ public class ConversationHistoryActivity extends AppCompatActivity {
 
     private void showConversationDetailsDialog(Conversation conversation) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_conversation_details, null);
-
-        // Configurar as views do dialog
         TextView textOriginal = dialogView.findViewById(R.id.dialog_text_original);
         TextView textTranslated = dialogView.findViewById(R.id.dialog_text_translated);
         TextView textLanguages = dialogView.findViewById(R.id.dialog_text_languages);
