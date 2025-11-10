@@ -7,10 +7,15 @@ import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rttc.dssmv_projectdroid_1231562_1230985.BuildConfig;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.ApiException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
+import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
+import rttc.dssmv_projectdroid_1231562_1230985.repository.CallBack;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +33,7 @@ public class ConversationRepository {
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> _saveResult = new MutableLiveData<>();
 
+    public CallBack callback;
     public void saveConversation(Conversation conversation, Context context) {
         new Thread(() -> {
             try {
@@ -69,21 +75,24 @@ public class ConversationRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-                String respBody = response.body().string();
+                String responseBody = response.body().string();
                 if (response.isSuccessful()) {
                     _saveResult.postValue(true);
                     loadConversations(context);
                 } else {
-                    _errorMessage.postValue("Failed to save conversation: " + response.code() + " - " + respBody);
-                    _saveResult.postValue(false);
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to save conversation: " + response.code()));
+                    }
                 }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
-                _errorMessage.postValue(e.getMessage());
-                _saveResult.postValue(false);
+                callback.onError(e);
             }
         }).start();
     }
-
     public void loadConversations(Context context) {
         new Thread(() -> {
             try {
@@ -113,6 +122,7 @@ public class ConversationRepository {
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
+                    callback.onSuccess();
                     List<Conversation> conversations = new ArrayList<>();
                     JSONArray conversationsArray = new JSONArray(responseBody);
                     SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
@@ -143,14 +153,19 @@ public class ConversationRepository {
                     }
                     _conversations.postValue(conversations);
                 } else {
-                    _errorMessage.postValue("Failed to load conversation: " + response.code() + " - " + responseBody);
+                if (response.code() == 401 || response.code() == 403) {
+                    callback.onError(new AuthException("Authentication Error: " + responseBody));
+                } else {
+                    callback.onError(new ApiException("Failed to load conversations: " + response.code()));
                 }
-            } catch (Exception e) {
-                _errorMessage.postValue(e.getMessage());
             }
+        } catch (SocketTimeoutException e) {
+            callback.onError(new NetworkException("Network Error: Connection timed out."));
+        } catch (Exception e) {
+            callback.onError(e);
+        }
         }).start();
     }
-
     public void deleteConversation(Conversation conversation, Context context) {
         new Thread(() -> {
             try{
@@ -178,12 +193,62 @@ public class ConversationRepository {
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
-                    loadConversations(context);
-                }else{
-                    _errorMessage.postValue("Failed to delete conversation: " + response.code() + " - " + responseBody);
+                    callback.onSuccess();
+                } else {
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to delete conversation: " + response.code()));
+                    }
                 }
-            }catch (Exception e){
-                _errorMessage.postValue("Error deleting conversation " + e.getMessage());
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
+            } catch (Exception e) {
+                callback.onError(e);
+            }
+        }).start();
+    }
+
+    public void updateFavoriteStatus(String conversationId, boolean isFavorite) {
+        new Thread(() -> {
+            try {
+                HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/conversations"))
+                        .newBuilder()
+                        .addQueryParameter("id", "eq." + conversationId)
+                        .build();
+
+                JSONObject bodyJson = new JSONObject();
+                bodyJson.put("is_favorite", isFavorite);
+                RequestBody body = RequestBody.create(
+                        bodyJson.toString(),
+                        MediaType.parse("application/json")
+                );
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .patch(body)
+                        .addHeader("apikey", SUPABASE_KEY)
+                        .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("Prefer", "return=minimal")
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    if (response.code() == 401 || response.code() == 403) {
+                        callback.onError(new AuthException("Authentication Error: " + responseBody));
+                    } else {
+                        callback.onError(new ApiException("Failed to update favorite: " + response.code()));
+                    }
+                }
+            } catch (SocketTimeoutException e) {
+                callback.onError(new NetworkException("Network Error: Connection timed out."));
+            } catch (Exception e) {
+                callback.onError(e);
             }
         }).start();
     }

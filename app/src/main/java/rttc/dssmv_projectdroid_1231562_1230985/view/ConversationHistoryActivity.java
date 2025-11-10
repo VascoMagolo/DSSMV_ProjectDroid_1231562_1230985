@@ -36,6 +36,7 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_conversation_history);
 
         ImageButton btnBack = findViewById(R.id.btnBack);
+
         recyclerView = findViewById(R.id.recyclerViewHistory);
         textView = findViewById(R.id.textEmpty);
         btnBack.setOnClickListener(v -> onBackPressed());
@@ -81,7 +82,8 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         TextView textLanguages = dialogView.findViewById(R.id.dialog_text_languages);
         TextView textTimestamp = dialogView.findViewById(R.id.dialog_text_timestamp);
         MaterialButton btnDelete = dialogView.findViewById(R.id.dialog_btn_delete);
-
+        MaterialButton btnFavorite = dialogView.findViewById(R.id.dialog_btn_favorite);
+        MaterialButton btnShare = dialogView.findViewById(R.id.dialog_btn_share);
         textOriginal.setText(conversation.getOriginalText() != null ? conversation.getOriginalText() : "");
         textTranslated.setText(conversation.getTranslatedText() != null ? conversation.getTranslatedText() : "");
 
@@ -104,12 +106,20 @@ public class ConversationHistoryActivity extends AppCompatActivity {
 
         final androidx.appcompat.app.AlertDialog dialog = dialogBuilder.create();
 
-
         btnDelete.setOnClickListener(v -> {
             dialog.dismiss();
             showDeleteConfirmationDialog(conversation);
         });
-
+        btnShare.setOnClickListener(v -> {
+            String shareContent = "Original: " + (conversation.getOriginalText() != null ? conversation.getOriginalText() : "") +
+                    "\n\nTranslated: " + (conversation.getTranslatedText() != null ? conversation.getTranslatedText() : "") +
+                    "\n\nLanguages: " + sourceLang + " → " + targetLang;
+            android.content.Intent shareIntent = new android.content.Intent();
+            shareIntent.setAction(android.content.Intent.ACTION_SEND);
+            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareContent);
+            shareIntent.setType("text/plain");
+            startActivity(android.content.Intent.createChooser(shareIntent, "Share conversation via"));
+        });
         dialog.show();
     }
 
