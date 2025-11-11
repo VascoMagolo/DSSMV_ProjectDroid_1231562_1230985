@@ -1,6 +1,6 @@
 package rttc.dssmv_projectdroid_1231562_1230985.exceptions;
 
-public class AuthException extends Exception {
+public class AuthException extends Exception { // Exception for authentication-related errors
     public AuthException(String message) {
         super(message);
     }

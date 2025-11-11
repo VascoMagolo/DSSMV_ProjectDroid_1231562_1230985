@@ -44,6 +44,8 @@ public class ImageFragment extends Fragment {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_CAMERA_PERMISSION = 100;
 
+    private static final int REQUEST_GALLERY_IMAGE = 2;
+
     private ImageView imgPreview;
     private TextView txtOriginal;
     private TextView txtTranslated;
@@ -66,7 +68,7 @@ public class ImageFragment extends Fragment {
         txtTranslated = view.findViewById(R.id.text_translated_from_image);
         autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
         MaterialButton btnTakePhoto = view.findViewById(R.id.btn_take_photo);
-
+        MaterialButton btnInsertPhoto = view.findViewById(R.id.btn_insert_photo);
         viewModel = new ViewModelProvider(this).get(ImageViewModel.class);
         sessionManager = new SessionManager(requireContext());
 
@@ -74,6 +76,7 @@ public class ImageFragment extends Fragment {
         setupObservers();
 
         btnTakePhoto.setOnClickListener(v -> openCamera());
+        btnInsertPhoto.setOnClickListener(v -> openGallery());
 
         return view;
     }
@@ -118,11 +121,11 @@ public class ImageFragment extends Fragment {
 
     private void setupObservers() {
         viewModel.getExtractedText().observe(getViewLifecycleOwner(), text -> {
-            txtOriginal.setText("Extracted Text:\n" + text);
+            txtOriginal.setText("\n" + text);
         });
 
         viewModel.getTranslatedText().observe(getViewLifecycleOwner(), text -> {
-            txtTranslated.setText("Translation:\n" + text);
+            txtTranslated.setText("\n" + text);
         });
 
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), loading -> {
@@ -159,6 +162,11 @@ public class ImageFragment extends Fragment {
         }
     }
 
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_GALLERY_IMAGE);
+    }
+
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -169,21 +177,35 @@ public class ImageFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK && photoUri != null) {
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), photoUri);
-                imgPreview.setImageBitmap(bitmap);
+        try {
+            Bitmap bitmap = null;
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                byte[] imageBytes = stream.toByteArray();
+            if (requestCode == REQUEST_IMAGE_CAPTURE && photoUri != null) {
+                bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), photoUri);
 
-                viewModel.processImage(imageBytes, targetLang);
-
-            } catch (IOException e) {
-                Toast.makeText(requireContext(), "Error processing the image", Toast.LENGTH_SHORT).show();
+            } else if (requestCode == REQUEST_GALLERY_IMAGE && data != null && data.getData() != null) {
+                Uri galleryUri = data.getData();
+                bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), galleryUri);
             }
+            if (bitmap != null) {
+                processBitmap(bitmap);
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(requireContext(), "Error processing image", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void processBitmap(Bitmap bitmap) {
+        imgPreview.setImageBitmap(bitmap);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+        byte[] imageBytes = stream.toByteArray();
+        viewModel.processImage(imageBytes, targetLang);
+    }
+
 }
