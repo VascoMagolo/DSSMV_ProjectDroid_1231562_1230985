@@ -1,130 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp"
         android:background="?attr/colorSurface"
         tools:context=".view.fragments.PhrasesFragment">
 
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Quick Phrases "
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:gravity="center"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginBottom="24dp" />
-
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:layout_marginBottom="20dp">
-
-        <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/menuLanguage"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="20dp">
+        <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:hint="Phrases in:">
+                android:text="Quick Phrases"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:gravity="center"
+                android:textColor="?attr/colorOnSurface"
+                android:layout_marginBottom="24dp" />
 
-            <AutoCompleteTextView
-                    android:id="@+id/autoCompleteLanguage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/menuTargetLanguage"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:hint="Translate to:">
-
-            <AutoCompleteTextView
-                    android:id="@+id/autoCompleteTargetLanguage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    tools:ignore="LabelFor" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </LinearLayout>
-
-    <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardTranslation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
-            app:strokeColor="?attr/colorOutline"
-            app:strokeWidth="1dp">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-            <TextView
-                    android:id="@+id/textOriginalPhrase"
-                    android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp"
+                android:baselineAligned="false">
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/menuSourceLanguage"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"
-                    tools:text="Original phrase" />
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Phrases in:">
 
-            <TextView
-                    android:id="@+id/textTranslatedPhrase"
-                    android:layout_width="match_parent"
+                <AutoCompleteTextView
+                        android:id="@+id/autoCompleteSourceLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        tools:ignore="LabelFor" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/menuTargetLanguage"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:textColor="?attr/colorPrimary"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp"
-                    tools:text="Translated phrase" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:hint="Translate to:">
 
-            <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSpeakTranslation"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Listen"
-                    android:textAllCaps="false"
-                    android:layout_gravity="center" />
-
+                <AutoCompleteTextView
+                        android:id="@+id/autoCompleteTargetLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        tools:ignore="LabelFor" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+        <androidx.cardview.widget.CardView
+                android:id="@+id/cardTranslation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
 
-    <TextView
-            android:layout_width="match_parent"
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                <TextView
+                        android:id="@+id/textOriginalPhrase"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"
+                        tools:text="Original phrase" />
+
+                <TextView
+                        android:id="@+id/textTranslatedPhrase"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"
+                        tools:text="Translated phrase" />
+
+                <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSpeakTranslation"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Speak"
+                        android:layout_gravity="end"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Touch a phrase to translate it:"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewPhrases"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_phrase"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Touch a phrase to translate it:"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android.layout.marginBottom="8dp" />
+            android:layout_gravity="bottom|end"
+            android:layout_margin="24dp"
+            app:srcCompat="@drawable/ic_add"
+            android:contentDescription="Add personal phrase" />
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewPhrases"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="8dp" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

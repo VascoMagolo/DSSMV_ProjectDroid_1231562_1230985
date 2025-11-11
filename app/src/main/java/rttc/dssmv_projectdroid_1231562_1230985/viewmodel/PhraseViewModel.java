@@ -18,14 +18,14 @@ public class PhraseViewModel extends ViewModel {
     private final PhraseRepository phraseRepository;
     private final UserPhraseRepository userPhraseRepository;
     private final TranslationRepository translationRepository;
-    private final MutableLiveData<List<GenericPhrase>> _genericPhrases = new MutableLiveData<>();
-    private final MutableLiveData<List<GenericPhrase>> _userPhrases = new MutableLiveData<>();
+    private final MutableLiveData<List<GenericPhrase>> _genericPhrases = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<GenericPhrase>> _userPhrases = new MutableLiveData<>(new ArrayList<>());
     private final MediatorLiveData<List<GenericPhrase>> _allPhrases = new MediatorLiveData<>();
-    public LiveData<List<GenericPhrase>> getAllPhrases() { return _allPhrases; }
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
-    public LiveData<String> getErrorMessage() { return _errorMessage; }
-    public MutableLiveData<String> translatedText = new MutableLiveData<>();
     private final MutableLiveData<String> _toastMessage = new MutableLiveData<>();
+    public final MutableLiveData<String> translatedText = new MutableLiveData<>();
+    public LiveData<List<GenericPhrase>> getAllPhrases() { return _allPhrases; }
+    public LiveData<String> getErrorMessage() { return _errorMessage; }
     public LiveData<String> getToastMessage() { return _toastMessage; }
 
 
@@ -33,27 +33,26 @@ public class PhraseViewModel extends ViewModel {
         phraseRepository = new PhraseRepository();
         userPhraseRepository = new UserPhraseRepository();
         translationRepository = new TranslationRepository();
-        _allPhrases.addSource(_genericPhrases, genericList ->
-                combineLists(_userPhrases.getValue(), genericList));
-        _allPhrases.addSource(_userPhrases, userList ->
-                combineLists(userList, _genericPhrases.getValue()));
+        _allPhrases.addSource(_genericPhrases, generic -> combineLists());
+        _allPhrases.addSource(_userPhrases, user -> combineLists());
     }
-
-    private void combineLists(List<GenericPhrase> userList, List<GenericPhrase> genericList) {
+    private void combineLists() {
         List<GenericPhrase> combined = new ArrayList<>();
-        if (userList != null) {
-            combined.addAll(userList);
+        List<GenericPhrase> userPhrases = _userPhrases.getValue();
+        List<GenericPhrase> genericPhrases = _genericPhrases.getValue();
+
+        if (userPhrases != null) {
+            combined.addAll(userPhrases);
         }
-        if (genericList != null) {
-            combined.addAll(genericList);
+        if (genericPhrases != null) {
+            combined.addAll(genericPhrases);
         }
         _allPhrases.postValue(combined);
     }
-    public void loadAllPhrases(Context context, String genericLang) {
-        loadGenericPhrases(genericLang);
+    public void loadAllPhrases(Context context, String initialLanguage) {
+        loadGenericPhrases(initialLanguage);
         loadUserPhrases(context);
     }
-
     public void loadGenericPhrases(String language) {
         phraseRepository.loadGenericPhrases(language, new PhraseRepository.LoadPhrasesCallback() {
             @Override
@@ -69,8 +68,8 @@ public class PhraseViewModel extends ViewModel {
     public void loadUserPhrases(Context context) {
         userPhraseRepository.loadUserPhrases(context, new UserPhraseRepository.LoadUserPhrasesCallback() {
             @Override
-            public void onSuccess(List<GenericPhrase> phrases) {
-                _userPhrases.postValue(phrases);
+            public void onSuccess(List<GenericPhrase> userPhrases) {
+                _userPhrases.postValue(userPhrases);
             }
             @Override
             public void onError(Exception e) {
@@ -78,16 +77,20 @@ public class PhraseViewModel extends ViewModel {
             }
         });
     }
-
     public void saveUserPhrase(GenericPhrase phrase, Context context) {
+
+        _toastMessage.postValue("Detecting language...");
         translationRepository.detectAndTranslate(phrase.getText(), "en", new TranslationRepository.TranslationCallback() {
+
             @Override
             public void onSuccess(String translated, String detectedLang) {
                 phrase.setLanguage(detectedLang);
+                _toastMessage.postValue("Language detected: " + detectedLang.toUpperCase() + ". Saving...");
+
                 userPhraseRepository.saveUserPhrase(phrase, context, new UserPhraseRepository.SaveCallback() {
                     @Override
                     public void onSuccess() {
-                        _toastMessage.postValue("Phrase saved.");
+                        _toastMessage.postValue("Phrase saved!");
                         loadUserPhrases(context);
                     }
                     @Override
@@ -96,16 +99,15 @@ public class PhraseViewModel extends ViewModel {
                     }
                 });
             }
+
             @Override
             public void onError(Exception e) {
-                _errorMessage.postValue("Error detecting language.Phrase not saved.");
+                _errorMessage.postValue("Error detecting language, phrase not saved.");
             }
         });
     }
 
     public void deleteUserPhrase(GenericPhrase phrase, Context context) {
-        if (!phrase.isUserPhrase()) return;
-
         userPhraseRepository.deleteUserPhrase(phrase, context, new UserPhraseRepository.DeleteCallback() {
             @Override
             public void onSuccess() {
@@ -124,9 +126,10 @@ public class PhraseViewModel extends ViewModel {
             public void onSuccess(String translated, String detectedLang) {
                 translatedText.postValue(translated);
             }
+
             @Override
             public void onError(Exception e) {
-                _errorMessage.postValue("Translation Error: " + e.getMessage());
+                _errorMessage.postValue(e.getMessage());
             }
         });
     }

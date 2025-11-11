@@ -21,13 +21,12 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
 public class UserPhraseRepository {
-
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
     public interface LoadUserPhrasesCallback {
-        void onSuccess(List<GenericPhrase> phrases);
+        void onSuccess(List<GenericPhrase> userPhrases);
         void onError(Exception e);
     }
     public interface SaveCallback {
@@ -46,7 +45,6 @@ public class UserPhraseRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
-
     public void loadUserPhrases(Context context, LoadUserPhrasesCallback callback) {
         new Thread(() -> {
             try {
@@ -54,14 +52,14 @@ public class UserPhraseRepository {
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
-                    callback.onSuccess(new ArrayList<>());
+                    callback.onError(new AuthException("User not logged in."));
                     return;
                 }
 
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/user_phrases"))
                         .newBuilder()
                         .addQueryParameter("user_id", "eq." + user.getId())
-                        .addQueryParameter("select", "*")
+                        .addQueryParameter("select" , "*")
                         .addQueryParameter("order", "created_at.desc")
                         .build();
 
@@ -86,7 +84,7 @@ public class UserPhraseRepository {
                         phrase.setUserId(object.getString("user_id"));
                         phrase.setCategory(object.optString("category", "Personal"));
                         phrase.setText(object.getString("text"));
-                        phrase.setText(object.getString("language"));
+                        phrase.setLanguage(object.optString("language", ""));
                         phrase.setUserPhrase(true);
                         userPhrases.add(phrase);
                     }
@@ -103,6 +101,7 @@ public class UserPhraseRepository {
             }
         }).start();
     }
+
     public void saveUserPhrase(GenericPhrase phrase, Context context, SaveCallback callback) {
         new Thread(() -> {
             try {
@@ -134,11 +133,10 @@ public class UserPhraseRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-
                 if (response.isSuccessful()) {
                     callback.onSuccess();
                 } else {
-                    callback.onError(new ApiException("Error saving phrase: " + response.code()));
+                    callback.onError(new ApiException("Failed to save phrase: " + response.code()));
                 }
             } catch (Exception e) {
                 callback.onError(e);
@@ -156,10 +154,15 @@ public class UserPhraseRepository {
                     return;
                 }
 
+                if (phrase.getId() == null) {
+                    callback.onError(new ApiException("Phrase ID is null. Cannot delete."));
+                    return;
+                }
+
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/user_phrases"))
                         .newBuilder()
                         .addQueryParameter("id", "eq." + phrase.getId())
-                        .addQueryParameter("user_id", "eq." + user.getId())
+                        .addQueryParameter("user_id", "eq." + user.getId()) // Segurança
                         .build();
 
                 Request request = new Request.Builder()
@@ -170,11 +173,10 @@ public class UserPhraseRepository {
                         .build();
 
                 Response response = client.newCall(request).execute();
-
                 if (response.isSuccessful()) {
                     callback.onSuccess();
                 } else {
-                    callback.onError(new ApiException("Error deleting phrase: " + response.code()));
+                    callback.onError(new ApiException("Failed to delete phrase: " + response.code()));
                 }
             } catch (Exception e) {
                 callback.onError(e);
