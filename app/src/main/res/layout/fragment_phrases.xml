@@ -5,14 +5,16 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorSurface"
-        tools:context=".view.fragments.PhrasesFragment">
+        android:background="?attr/colorSurface">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:background="?attr/colorSurface"
+            tools:context=".view.fragments.PhrasesFragment">
+
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,7 +38,6 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:hint="Phrases in:">
-
                 <AutoCompleteTextView
                         android:id="@+id/autoCompleteSourceLanguage"
                         android:layout_width="match_parent"
@@ -44,6 +45,7 @@
                         android:inputType="none"
                         tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/menuTargetLanguage"
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
@@ -61,7 +63,7 @@
                         tools:ignore="LabelFor" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTranslation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,8 +73,7 @@
                 app:cardElevation="4dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
                 app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp"
-                tools:visibility="visible">
+                app:strokeWidth="1dp">
 
             <LinearLayout
                     android:layout_width="match_parent"
@@ -84,21 +85,26 @@
                         android:id="@+id/textOriginalPhrase"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        tools:text="Original phrase"
                         android:textAppearance="?attr/textAppearanceBodyLarge"
                         android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold"
-                        android:layout_marginBottom="8dp"
-                        tools:text="Original phrase" />
+                        android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="8dp"/>
 
                 <TextView
                         android:id="@+id/textTranslatedPhrase"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        tools:text="Translated phrase"
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
                         android:textColor="?attr/colorPrimary"
                         android:textStyle="bold"
-                        android:layout_marginBottom="12dp"
-                        tools:text="Translated phrase" />
+                        android:layout_marginBottom="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSpeakTranslation"
@@ -109,8 +115,7 @@
                         android:layout_gravity="end"/>
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
                 android:layout_width="match_parent"
@@ -129,7 +134,6 @@
                 android:paddingBottom="8dp" />
 
     </LinearLayout>
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_phrase"
             android:layout_width="wrap_content"

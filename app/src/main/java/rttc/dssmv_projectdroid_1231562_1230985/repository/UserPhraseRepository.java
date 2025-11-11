@@ -1,11 +1,10 @@
 package rttc.dssmv_projectdroid_1231562_1230985.repository;
 
 import android.content.Context;
-import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import okhttp3.*;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public class UserPhraseRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
-    public void loadUserPhrases(Context context, LoadUserPhrasesCallback callback) {
+    public void loadUserPhrases(Context context, String inicialLanguage, LoadUserPhrasesCallback callback) {
         new Thread(() -> {
             try {
                 SessionManager session = new SessionManager(context);
@@ -59,6 +58,7 @@ public class UserPhraseRepository {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/user_phrases"))
                         .newBuilder()
                         .addQueryParameter("user_id", "eq." + user.getId())
+                        .addQueryParameter("language", "eq." + inicialLanguage)
                         .addQueryParameter("select" , "*")
                         .addQueryParameter("order", "created_at.desc")
                         .build();

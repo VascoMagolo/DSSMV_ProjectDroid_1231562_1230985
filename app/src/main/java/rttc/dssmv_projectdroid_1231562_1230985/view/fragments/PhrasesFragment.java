@@ -18,13 +18,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
@@ -39,6 +39,7 @@ public class PhrasesFragment extends Fragment {
     private RecyclerView recyclerView;
     private PhraseAdapter adapter;
     private TextToSpeech tts;
+    private SessionManager sessionManager;
 
     private AutoCompleteTextView autoCompleteSourceLanguage;
     private AutoCompleteTextView autoCompleteTargetLanguage;
@@ -48,10 +49,9 @@ public class PhrasesFragment extends Fragment {
     private TextView textOriginalPhrase;
     private TextView textTranslatedPhrase;
     private Button btnSpeakTranslation;
-
-    private String targetLang = "en";
     private String currentTranslatedPhrase = "";
-    private SessionManager sessionManager;
+    private String targetLang = "en";
+
     private String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
     private String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
@@ -59,16 +59,15 @@ public class PhrasesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_phrases, container, false);
-
         viewModel = new ViewModelProvider(this).get(PhraseViewModel.class);
         sessionManager = new SessionManager(requireContext());
-
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         recyclerView = view.findViewById(R.id.recyclerViewPhrases);
         autoCompleteSourceLanguage = view.findViewById(R.id.autoCompleteSourceLanguage);
         autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
@@ -78,32 +77,28 @@ public class PhrasesFragment extends Fragment {
         textOriginalPhrase = view.findViewById(R.id.textOriginalPhrase);
         textTranslatedPhrase = view.findViewById(R.id.textTranslatedPhrase);
         btnSpeakTranslation = view.findViewById(R.id.btnSpeakTranslation);
+
         setupTTS();
         setupRecyclerView();
         setupSourceLanguageMenu();
         setupTargetLanguageMenu();
         setupTranslationCard();
         setupObservers();
-
-        fabAddPhrase.setOnClickListener(v -> showAddPhraseDialog());
-        String initialLang = "pt";
-        User user = sessionManager.getUser();
-        if (user != null && user.getPreferredLanguage() != null && !user.getPreferredLanguage().isEmpty()) {
-            initialLang = user.getPreferredLanguage();
+        User currentUser = sessionManager.getUser();
+        if (currentUser == null) {
+            fabAddPhrase.setVisibility(View.GONE);
         }
 
-        autoCompleteSourceLanguage.setText(getLanguageNameFromCode(initialLang), false);
+        fabAddPhrase.setOnClickListener(v -> showAddPhraseDialog());
+        String initialLang = getLanguageCodeFromSelection(autoCompleteSourceLanguage.getText().toString());
+        if(initialLang.isEmpty()) initialLang = "pt";
         viewModel.loadAllPhrases(requireContext(), initialLang);
     }
 
     private void setupTTS() {
         tts = new TextToSpeech(getContext(), status -> {
             if (status != TextToSpeech.ERROR) {
-                Locale targetLocale = new Locale(targetLang);
-                int result = tts.setLanguage(targetLocale);
-                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    tts.setLanguage(Locale.US);
-                }
+                tts.setLanguage(Locale.US);
             }
         });
     }
@@ -119,14 +114,7 @@ public class PhrasesFragment extends Fragment {
             viewModel.translatePhrase(phrase.getText(), targetLang);
         });
         adapter.setOnDeleteClickListener(phrase -> {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Delete phrase")
-                    .setMessage("Are you sure that you want to delete the phrase: \"" + phrase.getText() + "\"?")
-                    .setNegativeButton("Cancel", null)
-                    .setPositiveButton("Delete", (dialog, which) -> {
-                        viewModel.deleteUserPhrase(phrase, requireContext());
-                    })
-                    .show();
+            showDeleteConfirmationDialog(phrase);
         });
     }
 
@@ -137,10 +125,13 @@ public class PhrasesFragment extends Fragment {
                 languages
         );
         autoCompleteSourceLanguage.setAdapter(spinnerAdapter);
-
+        String preferredLang = sessionManager.getUser() != null ? sessionManager.getUser().getPreferredLanguage() : "pt";
+        if (preferredLang.isEmpty()) preferredLang = "pt";
+        autoCompleteSourceLanguage.setText(getLanguageNameFromCode(preferredLang), false);
         autoCompleteSourceLanguage.setOnItemClickListener((parent, view, position, id) -> {
             String selectedLanguage = languageCodes[position];
-            viewModel.loadGenericPhrases(selectedLanguage);
+            viewModel.loadPhrasesForLanguage(requireContext(), selectedLanguage);
+            cardTranslation.setVisibility(View.GONE);
         });
     }
 
@@ -151,33 +142,19 @@ public class PhrasesFragment extends Fragment {
                 languages
         );
         autoCompleteTargetLanguage.setAdapter(spinnerAdapter);
-
-        User user = sessionManager.getUser();
-        String preferredLangCode = "en";
-        if (user != null && user.getPreferredLanguage() != null && !user.getPreferredLanguage().isEmpty()) {
-            preferredLangCode = user.getPreferredLanguage();
+        String preferredLang = sessionManager.getUser() != null ? sessionManager.getUser().getPreferredLanguage() : "en";
+        if (preferredLang.isEmpty()) preferredLang = "en";
+        if (preferredLang.equals("pt")) {
+            targetLang = "en";
+        } else {
+            targetLang = preferredLang;
         }
 
-        String preferredLangName = getLanguageNameFromCode(preferredLangCode);
-        autoCompleteTargetLanguage.setText(preferredLangName, false);
-        targetLang = preferredLangCode;
+        autoCompleteTargetLanguage.setText(getLanguageNameFromCode(targetLang), false);
 
         autoCompleteTargetLanguage.setOnItemClickListener((parent, view, position, id) -> {
             targetLang = languageCodes[position];
-
-            if (tts != null) {
-                Locale targetLocale = new Locale(targetLang);
-                int result = tts.setLanguage(targetLocale);
-                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    tts.setLanguage(Locale.US);
-                }
-            }
-            if (cardTranslation.getVisibility() == View.VISIBLE) {
-                String original = textOriginalPhrase.getText().toString();
-                if (!original.isEmpty()) {
-                    viewModel.translatePhrase(original, targetLang);
-                }
-            }
+            cardTranslation.setVisibility(View.GONE);
         });
     }
 
@@ -186,17 +163,27 @@ public class PhrasesFragment extends Fragment {
     }
 
     private String getLanguageNameFromCode(String langCode) {
-        if (langCode == null) return languages[0];
         for (int i = 0; i < languageCodes.length; i++) {
-            if (languageCodes[i].equalsIgnoreCase(langCode.trim())) {
+            if (languageCodes[i].trim().equalsIgnoreCase(langCode.trim())) {
                 return languages[i];
             }
         }
         return languages[0];
     }
 
+    private String getLanguageCodeFromSelection(String selectedText) {
+        for (int i = 0; i < languages.length; i++) {
+            if (languages[i].equals(selectedText)) {
+                return languageCodes[i];
+            }
+        }
+        return "";
+    }
+
     private void speakTranslation(String translatedText) {
         if (tts != null && translatedText != null && !translatedText.isEmpty()) {
+            Locale targetLocale = new Locale(targetLang);
+            tts.setLanguage(targetLocale);
             tts.speak(translatedText, TextToSpeech.QUEUE_FLUSH, null, "phrase_tts");
         }
     }
@@ -209,38 +196,46 @@ public class PhrasesFragment extends Fragment {
                 adapter.updatePhrases(new ArrayList<>());
             }
         });
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
-            if (error != null && !error.isEmpty()) {
-                Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_LONG).show();
-            }
-        });
-        viewModel.getToastMessage().observe(getViewLifecycleOwner(), message -> {
-            if (message != null && !message.isEmpty()) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
         viewModel.translatedText.observe(getViewLifecycleOwner(), translated -> {
             textTranslatedPhrase.setText(translated);
             currentTranslatedPhrase = translated;
         });
+        viewModel.getSaveSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (success) {
+                Toast.makeText(getContext(), "Phrase saved!", Toast.LENGTH_SHORT).show();
+                viewModel.clearSaveSuccess(); // Reset
+            }
+        });
+        viewModel.getDeleteSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (success) {
+                Toast.makeText(getContext(), "Phrase deleted.", Toast.LENGTH_SHORT).show();
+                viewModel.clearDeleteSuccess(); // Reset
+            }
+        });
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_LONG).show();
+                viewModel.clearErrorMessage(); // Reset
+            }
+        });
     }
+
     private void showAddPhraseDialog() {
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_add_phrases, null, false);
-
         TextInputEditText edtText = dialogView.findViewById(R.id.edt_new_phrase_text);
         TextInputEditText edtCategory = dialogView.findViewById(R.id.edt_new_phrase_category);
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Add personal phrase")
+                .setTitle("Add Personal Phrase")
                 .setView(dialogView)
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("save", (dialog, which) -> {
-                    String text = edtText.getText().toString().trim();
-                    String category = edtCategory.getText().toString().trim();
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String text = Objects.requireNonNull(edtText.getText()).toString().trim();
+                    String category = Objects.requireNonNull(edtCategory.getText()).toString().trim();
 
                     if (text.isEmpty()) {
-                        Toast.makeText(getContext(), "Cannot be empty.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Phrase cannot be empty.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (category.isEmpty()) {
@@ -250,8 +245,20 @@ public class PhrasesFragment extends Fragment {
                     GenericPhrase newPhrase = new GenericPhrase();
                     newPhrase.setText(text);
                     newPhrase.setCategory(category);
+                    newPhrase.setUserPhrase(true);
 
-                    viewModel.saveUserPhrase(newPhrase, requireContext());
+                    viewModel.saveUserPhrase(requireContext(), newPhrase);
+                })
+                .show();
+    }
+
+    private void showDeleteConfirmationDialog(GenericPhrase phrase) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete Phrase?")
+                .setMessage("Are you sure you want to delete this phrase?\n\n\"" + phrase.getText() + "\"")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    viewModel.deleteUserPhrase(requireContext(), phrase);
                 })
                 .show();
     }
