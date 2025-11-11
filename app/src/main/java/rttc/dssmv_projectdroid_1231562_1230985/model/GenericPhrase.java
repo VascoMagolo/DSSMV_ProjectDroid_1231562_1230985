@@ -5,9 +5,10 @@ public class GenericPhrase {
     private String text;
     private String language;
     private String category;
+    private boolean isUserPhrase = false;
+    private String userId;
 
     public GenericPhrase(){}
-
     public GenericPhrase(String text, String language, String category) {
         this.text = text;
         this.language = language;
@@ -25,4 +26,9 @@ public class GenericPhrase {
 
     public String getCategory() {return category;}
     public void setCategory(String category) {this.category = category;}
+
+    public boolean isUserPhrase() {return isUserPhrase;}
+    public void setUserPhrase(boolean userPhrase) {isUserPhrase = userPhrase;}
+    public String getUserId() {return userId;}
+    public void setUserId(String userId) {this.userId = userId;}
 }

@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:text="Delete"
                     android:textColor="?attr/colorError"
-                    app:icon="@drawable/baseline_delete_forever_24"
+                    app:icon="@drawable/ic_delete"
                     app:iconTint="?attr/colorError"
                     style="@style/Widget.Material3.Button.TextButton"/>
             <View
@@ -121,7 +121,7 @@
                     android:id="@+id/dialog_btn_share"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_share"
+                    app:icon="@drawable/ic_share_2"
                     app:iconTint="?attr/colorOnSurfaceVariant"
                     style="@style/Widget.Material3.Button.IconButton"/>
 

@@ -22,18 +22,18 @@
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnHistory"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:text="See Conversation History"
             android:textSize="16sp"
-            app:icon="@android:drawable/ic_menu_recent_history"
+            app:icon="@drawable/ic_history"
             app:iconTint="?attr/colorOnPrimaryContainer"
             android:insetTop="12dp"
             android:insetBottom="12dp"
             android:textAllCaps="false"
             app:cornerRadius="16dp"
-            app:iconGravity="textStart"
+
             app:layout_constraintTop_toBottomOf="@id/textGreeting"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -41,13 +41,25 @@
             app:backgroundTint="?attr/colorPrimaryContainer"
             android:textColor="?attr/colorOnPrimaryContainer" />
 
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEditProfile"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Editar Perfil"
+            app:icon="@drawable/ic_update_account"
+            app:layout_constraintTop_toBottomOf="@id/btnHistory"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDeleteAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@drawable/baseline_delete_forever_24"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:icon="@drawable/ic_delete"
+            style="@style/Widget.Material3.Button.TextButton"
             android:text="Delete Account"
             android:textSize="16sp"
             android:iconTint="?attr/colorError"
@@ -69,7 +81,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TextButton"
             app:icon="@drawable/baseline_logout_24"
             android:text="Logout"
             android:textSize="16sp"

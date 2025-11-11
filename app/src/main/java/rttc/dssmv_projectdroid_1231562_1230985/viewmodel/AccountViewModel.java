@@ -18,6 +18,7 @@ public class AccountViewModel extends AndroidViewModel {
     private final AccountRepository accountRepository;
     private final MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> updateSuccess = new MutableLiveData<>();
 
     public AccountViewModel(@NonNull Application application) {
         super(application);
@@ -26,6 +27,7 @@ public class AccountViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getDeleteSuccess() { return deleteSuccess; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<Boolean> getUpdateSuccess() { return updateSuccess; }
 
     public void deleteUserAccount(Context context) {
         SessionManager session = new SessionManager(context);
@@ -53,9 +55,35 @@ public class AccountViewModel extends AndroidViewModel {
                 } else if (e instanceof NetworkException) {
                     errorMessage.postValue("Network Error: " + e.getMessage());
                 } else {
-                    errorMessage.postValue("An unexpected error occurred.");
+                    errorMessage.postValue("An unexpected error occurred: " + e.getMessage());
                 }
                 deleteSuccess.postValue(false);
+            }
+        });
+    }
+
+    public void updateUserAccount(Context context, User user) {
+        if (user == null || user.getId() == null) {
+            errorMessage.postValue("User data is invalid.");
+            return;
+        }
+        updateSuccess.postValue(false);
+        errorMessage.postValue(null);
+        accountRepository.updateAccount(context, user, new AccountRepository.UpdateCallback() {
+            @Override
+            public void onSuccess() {
+                updateSuccess.postValue(true);
+            }
+            @Override
+            public void onError(Exception e) {
+                if (e instanceof AuthException) {
+                    errorMessage.postValue("Authentication Error. Please log in again.");
+                } else if (e instanceof NetworkException) {
+                    errorMessage.postValue("Network Error: " + e.getMessage());
+                } else {
+                    errorMessage.postValue("An unexpected update error occurred.");
+                }
+                updateSuccess.postValue(false);
             }
         });
     }
