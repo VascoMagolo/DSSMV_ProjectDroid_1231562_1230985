@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:text="Delete"
                     android:textColor="?attr/colorError"
-                    app:icon="@drawable/baseline_delete_forever_24"
+                    app:icon="@drawable/ic_delete"
                     app:iconTint="?attr/colorError"
                     style="@style/Widget.Material3.Button.TextButton"/>
             <View
