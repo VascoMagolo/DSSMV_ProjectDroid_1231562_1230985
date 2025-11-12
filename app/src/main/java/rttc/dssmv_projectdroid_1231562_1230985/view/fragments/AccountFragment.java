@@ -5,28 +5,31 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.view.ConversationHistoryActivity;
+import rttc.dssmv_projectdroid_1231562_1230985.view.ImageHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
-
-import java.util.Calendar;
-import java.util.Date;
 
 public class AccountFragment extends Fragment {
     private AccountViewModel viewModel;
@@ -54,26 +57,23 @@ public class AccountFragment extends Fragment {
         MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
         MaterialButton btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
         MaterialButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
+        MaterialButton btnImageHistory = view.findViewById(R.id.btnImageHistory);
+
+
         updateGreeting();
-        User user = sessionManager.getUser();
-        Date currentTime = Calendar.getInstance().getTime();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentTime);
-        if (user != null) {
-            String displayName = user.getName();
-            if (displayName == null || displayName.isEmpty()) {
-                displayName = user.getEmail();
-            }
-            textGreeting.setText(getTimeofTheDayGreeting(displayName));
-        }
+
+
         btnHistory.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ConversationHistoryActivity.class);
             startActivity(intent);
         });
 
-        btnEditProfile.setOnClickListener(v -> {
-            showUpdateProfileDialog();
+        btnImageHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ImageHistoryActivity.class);
+            startActivity(intent);
         });
+
+        btnEditProfile.setOnClickListener(v -> showUpdateProfileDialog());
 
         btnLogout.setOnClickListener(v -> {
             sessionManager.clearSession();
@@ -81,9 +81,7 @@ public class AccountFragment extends Fragment {
             navigateToLogin();
         });
 
-        btnDeleteAccount.setOnClickListener(v -> {
-            showDeleteConfirmationDialog();
-        });
+        btnDeleteAccount.setOnClickListener(v -> showDeleteConfirmationDialog());
 
         setupObservers();
     }
@@ -103,7 +101,6 @@ public class AccountFragment extends Fragment {
             }
         });
 
-
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
@@ -117,19 +114,25 @@ public class AccountFragment extends Fragment {
             Toast.makeText(getContext(), "Error: User not found.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_update_account, null, false);
+
         TextInputEditText edtName = dialogView.findViewById(R.id.edt_update_name);
         AutoCompleteTextView autoCompleteLang = dialogView.findViewById(R.id.autoComplete_update_language);
+
         edtName.setText(currentUser.getName());
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
                 languages
         );
         autoCompleteLang.setAdapter(adapter);
+
         String currentLangName = getLanguageNameFromCode(currentUser.getPreferredLanguage());
         autoCompleteLang.setText(currentLangName, false);
+
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Update Profile")
                 .setView(dialogView)
@@ -139,17 +142,17 @@ public class AccountFragment extends Fragment {
                     String selectedLangName = autoCompleteLang.getText().toString();
                     String newLangCode = getLanguageCodeFromSelection(selectedLangName);
 
-                    if(newName.isEmpty()) {
+                    if (newName.isEmpty()) {
                         Toast.makeText(getContext(), "Name cannot be empty.", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
                     currentUser.setName(newName);
                     currentUser.setPreferredLanguage(newLangCode);
                     viewModel.updateUserAccount(requireContext(), currentUser);
                 })
                 .show();
     }
-
 
     private void showDeleteConfirmationDialog() {
         new MaterialAlertDialogBuilder(requireContext())
@@ -170,6 +173,7 @@ public class AccountFragment extends Fragment {
         startActivity(intent);
         getActivity().finish();
     }
+
     private void updateGreeting() {
         User user = sessionManager.getUser();
         if (user != null && textGreeting != null) {
@@ -177,37 +181,38 @@ public class AccountFragment extends Fragment {
             if (displayName == null || displayName.isEmpty()) {
                 displayName = user.getEmail();
             }
-            textGreeting.setText(getTimeofTheDayGreeting(displayName));
+            textGreeting.setText(getTimeOfDayGreeting(displayName));
         }
     }
-    private String getTimeofTheDayGreeting(String displayName) {
-        Date currentTime = Calendar.getInstance().getTime();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentTime);
 
+    private String getTimeOfDayGreeting(String displayName) {
+        Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
         if (hour >= 5 && hour < 12) {
-            return "Good Morning, " + displayName + "! \uD83D\uDC4B";
+            return "Good Morning, " + displayName + "! 👋";
         } else if (hour >= 12 && hour < 18) {
-            return "Good Afternoon, " + displayName + "! \uD83D\uDC4B";
+            return "Good Afternoon, " + displayName + "! 👋";
         } else {
-            return "Good Evening, " + displayName + "! \uD83D\uDC4B";
+            return "Good Evening, " + displayName + "! 👋";
         }
     }
+
     private String getLanguageNameFromCode(String langCode) {
         for (int i = 0; i < languageCodes.length; i++) {
             if (languageCodes[i].equals(langCode)) {
                 return languages[i];
             }
         }
-        return languages[0]; // Default to first language if not found
+        return languages[0];
     }
+
     private String getLanguageCodeFromSelection(String selectedText) {
         for (int i = 0; i < languages.length; i++) {
             if (languages[i].equals(selectedText)) {
                 return languageCodes[i];
             }
         }
-        return languageCodes[0]; // Default to first language code if not found
+        return languageCodes[0];
     }
 }

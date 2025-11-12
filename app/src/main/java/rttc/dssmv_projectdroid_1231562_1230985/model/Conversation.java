@@ -50,6 +50,7 @@ public class Conversation {
     public String getTargetLanguage() { return targetLanguage; }
     public void setTargetLanguage(String targetLanguage) { this.targetLanguage = targetLanguage; }
 
+
     public Date getTimestamp() { return timestamp; }
     public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 }

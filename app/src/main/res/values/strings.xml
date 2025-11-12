@@ -1,4 +1,6 @@
 <resources>
+    <string name="ocr_image">OCR image</string>
+    <string name="back">Back</string>
     <string name="app_name">RTCT</string>
     <string name="image_preview">hi</string>
     <string name="back_button">Back</string>
