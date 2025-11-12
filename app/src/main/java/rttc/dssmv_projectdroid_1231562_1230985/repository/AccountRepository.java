@@ -41,22 +41,22 @@ public class AccountRepository {
             try {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/users"))
                         .newBuilder()
-                        .addQueryParameter("id", "eq." + userId) // Filter to delete specific user by ID
+                        .addQueryParameter("id", "eq." + userId) // Filter to delete specific user by ID, this is like a 'where' in a sql query
                         .build();
 
-                Request request = new Request.Builder()
+                Request request = new Request.Builder() // creating the request to delete the user
                         .url(url)
                         .delete()
                         .addHeader("apikey", SUPABASE_KEY)
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                Response response = client.newCall(request).execute(); // calling the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
                     SessionManager session = new SessionManager(context);
-                    session.clearSession();
+                    session.clearSession(); // clearing shared prefs
 
                     Log.d("DELETE_ACCOUNT", "User deleted successfully from Supabase.");
                     callback.onSuccess();
@@ -64,7 +64,7 @@ public class AccountRepository {
                 } else {
                     Log.e("DELETE_ACCOUNT", "Error deleting user: " + response.code() + " -> " + responseBody);
 
-                    if (response.code() == 401 || response.code() == 403) {
+                    if (response.code() == 401 || response.code() == 403) { // error 401 invalid token, error 403 access denied (prob. error with not finding the user)
                         callback.onError(new AuthException("Authentication error: " + responseBody));
                     } else {
                         callback.onError(new Exception("Delete error: " + response.code() + " " + responseBody));
@@ -142,5 +142,5 @@ public class AccountRepository {
                 callback.onError(e);
             }
         }).start();
-    } // Method to update user account for later use
+    } // Method to update user account
 }
