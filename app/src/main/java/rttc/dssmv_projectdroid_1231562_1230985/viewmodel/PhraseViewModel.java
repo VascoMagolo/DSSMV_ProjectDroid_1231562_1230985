@@ -1,6 +1,7 @@
 package rttc.dssmv_projectdroid_1231562_1230985.viewmodel;
 
 import android.content.Context;
+import android.widget.Toast;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -70,6 +71,7 @@ public class PhraseViewModel extends ViewModel {
     public void loadPhrasesForLanguage(Context context, String language) {
         loadGenericPhrases(language);
         loadUserPhrases(context, language);
+
     }
     private void loadGenericPhrases(String language) {
         phraseRepository.loadGenericPhrases(language, new PhraseRepository.LoadPhrasesCallback() {

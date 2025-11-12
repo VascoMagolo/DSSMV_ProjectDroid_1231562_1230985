@@ -16,8 +16,6 @@ import java.util.List;
 public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseViewHolder> {
 
     private List<GenericPhrase> phraseList;
-
-    // Interfaces de Clique
     private OnPhraseClickListener phraseClickListener;
     private OnDeleteClickListener deleteClickListener;
 

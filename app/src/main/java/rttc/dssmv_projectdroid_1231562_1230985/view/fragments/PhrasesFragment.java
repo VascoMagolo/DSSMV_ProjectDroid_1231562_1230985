@@ -203,19 +203,19 @@ public class PhrasesFragment extends Fragment {
         viewModel.getSaveSuccess().observe(getViewLifecycleOwner(), success -> {
             if (success) {
                 Toast.makeText(getContext(), "Phrase saved!", Toast.LENGTH_SHORT).show();
-                viewModel.clearSaveSuccess(); // Reset
+                viewModel.clearSaveSuccess();
             }
         });
         viewModel.getDeleteSuccess().observe(getViewLifecycleOwner(), success -> {
             if (success) {
                 Toast.makeText(getContext(), "Phrase deleted.", Toast.LENGTH_SHORT).show();
-                viewModel.clearDeleteSuccess(); // Reset
+                viewModel.clearDeleteSuccess();
             }
         });
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_LONG).show();
-                viewModel.clearErrorMessage(); // Reset
+                viewModel.clearErrorMessage();
             }
         });
     }
