@@ -44,21 +44,21 @@ public class UserPhraseRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
-    public void loadUserPhrases(Context context, String inicialLanguage, LoadUserPhrasesCallback callback) {
+    public void loadUserPhrases(Context context, String initialLanguage, LoadUserPhrasesCallback callback) {
         new Thread(() -> {
             try {
                 SessionManager session = new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
-                    callback.onError(new AuthException("User not logged in."));
+                    callback.onSuccess(new ArrayList<>());
                     return;
                 }
 
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/user_phrases"))
                         .newBuilder()
                         .addQueryParameter("user_id", "eq." + user.getId())
-                        .addQueryParameter("language", "eq." + inicialLanguage)
+                        .addQueryParameter("language", "eq." + initialLanguage)
                         .addQueryParameter("select" , "*")
                         .addQueryParameter("order", "created_at.desc")
                         .build();
@@ -162,7 +162,7 @@ public class UserPhraseRepository {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/user_phrases"))
                         .newBuilder()
                         .addQueryParameter("id", "eq." + phrase.getId())
-                        .addQueryParameter("user_id", "eq." + user.getId()) // Segurança
+                        .addQueryParameter("user_id", "eq." + user.getId())
                         .build();
 
                 Request request = new Request.Builder()

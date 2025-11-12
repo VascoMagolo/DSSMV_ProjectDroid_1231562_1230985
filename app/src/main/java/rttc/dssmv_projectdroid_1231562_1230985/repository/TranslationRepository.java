@@ -42,6 +42,19 @@ public class TranslationRepository {
         });
     }
 
+    public void translate(String text, String sourceLang, String targetLang, TranslationCallback callback) {
+        translateText(text, sourceLang, targetLang, new TranslationApiCallback() {
+            @Override
+            public void onSuccess(String translatedText) {
+                callback.onSuccess(translatedText, sourceLang);
+            }
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
+            }
+        });
+    }
+
     private interface LanguageDetectionCallback {
         void onSuccess(String detectedLang);
         void onError(Exception e);

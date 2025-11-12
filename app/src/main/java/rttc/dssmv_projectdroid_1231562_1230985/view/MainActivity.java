@@ -5,10 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.AccountFragment;
-import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ConversationFragment;
-import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.ImageFragment;
-import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.PhrasesFragment;
+import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
                 selected = new PhrasesFragment();
             } else if (item.getItemId() == R.id.nav_account) {
                 selected = new AccountFragment();
+            } else if (item.getItemId() == R.id.nav_bilingual) {
+                selected = new BilingualFragment();
             }
 
             if (selected != null) {
