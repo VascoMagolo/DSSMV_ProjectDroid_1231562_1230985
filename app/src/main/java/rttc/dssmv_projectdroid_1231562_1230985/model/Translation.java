@@ -2,7 +2,7 @@ package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 import java.util.Date;
 
-public class Conversation {
+public class Translation {
     private String id;
     private String userId;
     private String originalText;
@@ -20,10 +20,10 @@ public class Conversation {
         isFavorite = favorite;
     }
 
-    public Conversation() {}
+    public Translation() {}
 
-    public Conversation(String userId, String originalText, String translatedText,
-                        String sourceLanguage, String targetLanguage) {
+    public Translation(String userId, String originalText, String translatedText,
+                       String sourceLanguage, String targetLanguage) {
         this.userId = userId;
         this.originalText = originalText;
         this.translatedText = translatedText;
