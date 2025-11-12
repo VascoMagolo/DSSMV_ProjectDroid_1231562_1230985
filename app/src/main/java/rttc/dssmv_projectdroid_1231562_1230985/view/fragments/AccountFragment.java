@@ -17,11 +17,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import java.util.Arrays;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
-import rttc.dssmv_projectdroid_1231562_1230985.view.ConversationHistoryActivity;
+import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 
@@ -67,7 +66,7 @@ public class AccountFragment extends Fragment {
             textGreeting.setText(getTimeofTheDayGreeting(displayName));
         }
         btnHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ConversationHistoryActivity.class);
+            Intent intent = new Intent(getActivity(), TranslationHistoryActivity.class);
             startActivity(intent);
         });
 

@@ -17,20 +17,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Locale;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
-import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationHistoryViewModel;
-import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationViewModel;
+import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationHistoryViewModel;
+import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationViewModel;
 
-public class ConversationFragment extends Fragment {
+public class TranslationFragment extends Fragment {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
-    private ConversationViewModel viewModel;
+    private TranslationViewModel viewModel;
     private TextToSpeech tts;
     private boolean ttsReady = false;
     private String translatedText = "";
-    private ConversationHistoryViewModel historyViewModel;
+    private TranslationHistoryViewModel historyViewModel;
     private String pendingOriginalText = null;
     private String pendingTranslatedText = null;
     private String pendingDetectedLanguage = null;
@@ -45,11 +45,11 @@ public class ConversationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        viewModel = new ViewModelProvider(this).get(ConversationViewModel.class);
-        historyViewModel = new ViewModelProvider(this).get(ConversationHistoryViewModel.class);
+        viewModel = new ViewModelProvider(this).get(TranslationViewModel.class);
+        historyViewModel = new ViewModelProvider(this).get(TranslationHistoryViewModel.class);
         sessionManager = new SessionManager(requireContext());
 
-        return inflater.inflate(R.layout.fragment_conversation, container, false);
+        return inflater.inflate(R.layout.fragment_translation, container, false);
     }
 
     @Override
@@ -123,21 +123,21 @@ public class ConversationFragment extends Fragment {
         viewModel.recognizedText.observe(getViewLifecycleOwner(), text -> {
             txtRecognized.setText(text);
             pendingOriginalText = text;
-            tryToSaveConversation();
+            tryToSavetranslation();
         });
 
         viewModel.translatedText.observe(getViewLifecycleOwner(), translated -> {
             txtTranslated.setText(translated);
             translatedText = translated != null ? translated : "";
             pendingTranslatedText = translated;
-            tryToSaveConversation();
+            tryToSavetranslation();
         });
 
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {
             if (lang != null && !lang.isEmpty()) {
                 txtOriginalLang.setText("Detetado: " + lang.toUpperCase());
                 pendingDetectedLanguage = lang;
-                tryToSaveConversation();
+                tryToSavetranslation();
                 if (ttsReady) {
                     Locale locale = new Locale(lang);
                     tts.setLanguage(locale);
@@ -175,7 +175,7 @@ public class ConversationFragment extends Fragment {
         }
     }
 
-    private void tryToSaveConversation() {
+    private void tryToSavetranslation() {
         if (pendingOriginalText != null &&
                 pendingTranslatedText != null &&
                 pendingDetectedLanguage != null) {
@@ -186,17 +186,17 @@ public class ConversationFragment extends Fragment {
             }
 
             try {
-                Conversation conversation = new Conversation(
+                Translation translation = new Translation(
                         null,
                         pendingOriginalText,
                         pendingTranslatedText,
                         sourceLang,
                         targetLang
                 );
-                historyViewModel.saveConversation(conversation, requireContext());
+                historyViewModel.savetranslation(translation, requireContext());
 
             } catch (Exception e) {
-                Toast.makeText(getContext(), "Error saving conversation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error saving translation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             pendingOriginalText = null;

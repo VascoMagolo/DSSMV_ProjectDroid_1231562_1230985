@@ -13,7 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
 
-public class ConversationViewModel extends AndroidViewModel {
+public class TranslationViewModel extends AndroidViewModel {
 
     private final TranslationRepository repository;
     private SpeechRecognizer recognizer;
@@ -30,7 +30,7 @@ public class ConversationViewModel extends AndroidViewModel {
     private final MutableLiveData<String> _statusMessage = new MutableLiveData<>();
     public LiveData<String> statusMessage = _statusMessage;
 
-    public ConversationViewModel(@NonNull Application application) {
+    public TranslationViewModel(@NonNull Application application) {
         super(application);
         repository = new TranslationRepository();
     }

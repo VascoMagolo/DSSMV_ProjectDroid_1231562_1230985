@@ -16,43 +16,43 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
-import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
-import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.ConversationAdapter;
-import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ConversationHistoryViewModel;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
+import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.TranslationAdapter;
+import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationHistoryViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ConversationHistoryActivity extends AppCompatActivity {
+public class TranslationHistoryActivity extends AppCompatActivity {
 
-    private ConversationHistoryViewModel viewModel;
+    private TranslationHistoryViewModel viewModel;
     private RecyclerView recyclerView;
-    private ConversationAdapter adapter;
+    private TranslationAdapter adapter;
     private TextView textView;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conversation_history);
+        setContentView(R.layout.activity_translation_history);
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> onBackPressed());
         recyclerView = findViewById(R.id.recyclerViewHistory);
         textView = findViewById(R.id.textEmpty);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ConversationAdapter(new ArrayList<>());
+        adapter = new TranslationAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
-        viewModel = new ViewModelProvider(this).get(ConversationHistoryViewModel.class);
-        adapter.setOnConversationClickListener(this::showConversationDetailsDialog);
+        viewModel = new ViewModelProvider(this).get(TranslationHistoryViewModel.class);
+        adapter.setOntranslationClickListener(this::showtranslationDetailsDialog);
         setupObservers();
-        viewModel.loadConversations(this);
+        viewModel.loadtranslations(this);
     }
 
     private void setupObservers() {
-        viewModel.getConversations().observe(this, conversations -> {
-            adapter.updateConversations(conversations);
-            if (conversations.isEmpty()) {
+        viewModel.gettranslations().observe(this, translations -> {
+            adapter.updatetranslations(translations);
+            if (translations.isEmpty()) {
                 textView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             } else {
@@ -63,12 +63,12 @@ public class ConversationHistoryActivity extends AppCompatActivity {
 
         viewModel.getErrorMessage().observe(this, errorMessage -> {
             if (errorMessage != null && !errorMessage.isEmpty()) {
-                Toast.makeText(ConversationHistoryActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(TranslationHistoryActivity.this, errorMessage, Toast.LENGTH_LONG).show();
             }
         });
         viewModel.getDeleteSuccess().observe(this, success -> {
             if (success) {
-                Toast.makeText(this, "Conversation deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "translation deleted", Toast.LENGTH_SHORT).show();
             }
         });
         viewModel.getFavoriteUpdateSuccess().observe(this, success -> {
@@ -78,8 +78,8 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         });
     }
 
-    private void showConversationDetailsDialog(Conversation conversation) {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_conversation_details, null);
+    private void showtranslationDetailsDialog(Translation translation) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_translation_details, null);
         TextView textOriginal = dialogView.findViewById(R.id.dialog_text_original);
         TextView textTranslated = dialogView.findViewById(R.id.dialog_text_translated);
         TextView textLanguages = dialogView.findViewById(R.id.dialog_text_languages);
@@ -87,58 +87,58 @@ public class ConversationHistoryActivity extends AppCompatActivity {
         MaterialButton btnDelete = dialogView.findViewById(R.id.dialog_btn_delete);
         MaterialButton btnFavorite = dialogView.findViewById(R.id.dialog_btn_favorite);
         MaterialButton btnShare = dialogView.findViewById(R.id.dialog_btn_share);
-        textOriginal.setText(conversation.getOriginalText() != null ? conversation.getOriginalText() : "");
-        textTranslated.setText(conversation.getTranslatedText() != null ? conversation.getTranslatedText() : "");
-        String sourceLang = conversation.getSourceLanguage() != null ?
-                conversation.getSourceLanguage().toUpperCase() : "Auto";
-        String targetLang = conversation.getTargetLanguage() != null ?
-                conversation.getTargetLanguage().toUpperCase() : "EN";
+        textOriginal.setText(translation.getOriginalText() != null ? translation.getOriginalText() : "");
+        textTranslated.setText(translation.getTranslatedText() != null ? translation.getTranslatedText() : "");
+        String sourceLang = translation.getSourceLanguage() != null ?
+                translation.getSourceLanguage().toUpperCase() : "Auto";
+        String targetLang = translation.getTargetLanguage() != null ?
+                translation.getTargetLanguage().toUpperCase() : "EN";
         textLanguages.setText(String.format(Locale.getDefault(), "%s → %s", sourceLang, targetLang));
 
-        if (conversation.getTimestamp() != null) {
-            textTimestamp.setText(dateFormat.format(conversation.getTimestamp()));
+        if (translation.getTimestamp() != null) {
+            textTimestamp.setText(dateFormat.format(translation.getTimestamp()));
         } else {
             textTimestamp.setText("Data unavailable");
         }
-        updateFavoriteIcon(btnFavorite, conversation.getFavorite());
+        updateFavoriteIcon(btnFavorite, translation.getFavorite());
 
 
         MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this)
                 .setView(dialogView)
-                .setTitle("Conversation details")
+                .setTitle("translation details")
                 .setPositiveButton("Close", null);
         final androidx.appcompat.app.AlertDialog dialog = dialogBuilder.create();
         btnDelete.setOnClickListener(v -> {
             dialog.dismiss();
-            showDeleteConfirmationDialog(conversation);
+            showDeleteConfirmationDialog(translation);
         });
         btnFavorite.setOnClickListener(v -> {
-            boolean newStatus = !conversation.getFavorite();
-            viewModel.updateFavoriteStatus(conversation.getId(), newStatus, this);
-            conversation.setFavorite(newStatus);
+            boolean newStatus = !translation.getFavorite();
+            viewModel.updateFavoriteStatus(translation.getId(), newStatus, this);
+            translation.setFavorite(newStatus);
             updateFavoriteIcon(btnFavorite, newStatus);
         });
 
         btnShare.setOnClickListener(v -> {
-            String shareContent = "Original: " + (conversation.getOriginalText() != null ? conversation.getOriginalText() : "") +
-                    "\n\nTranslated: " + (conversation.getTranslatedText() != null ? conversation.getTranslatedText() : "") +
+            String shareContent = "Original: " + (translation.getOriginalText() != null ? translation.getOriginalText() : "") +
+                    "\n\nTranslated: " + (translation.getTranslatedText() != null ? translation.getTranslatedText() : "") +
                     "\n\nLanguages: " + sourceLang + " → " + targetLang;
             android.content.Intent shareIntent = new android.content.Intent();
             shareIntent.setAction(android.content.Intent.ACTION_SEND);
             shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareContent);
             shareIntent.setType("text/plain");
-            startActivity(android.content.Intent.createChooser(shareIntent, "Share conversation via"));
+            startActivity(android.content.Intent.createChooser(shareIntent, "Share translation via"));
         });
         dialog.show();
     }
 
-    private void showDeleteConfirmationDialog(Conversation conversation) {
+    private void showDeleteConfirmationDialog(Translation translation) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Delete conversation?")
-                .setMessage("Are you sure you want to delete this conversation? This action cannot be undone")
+                .setTitle("Delete translation?")
+                .setMessage("Are you sure you want to delete this translation? This action cannot be undone")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    viewModel.deleteConversation(conversation, this);
+                    viewModel.deletetranslation(translation, this);
                 })
                 .show();
     }

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selected = null;
             if (item.getItemId() == R.id.nav_voice) {
-                selected = new ConversationFragment();
+                selected = new TranslationFragment();
             } else if (item.getItemId() == R.id.nav_image) {
                 selected = new ImageFragment();
             } else if (item.getItemId() == R.id.nav_phrases) {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new ConversationFragment())
+                    .replace(R.id.fragment_container, new BilingualFragment())
                     .commit();
         }
     }
