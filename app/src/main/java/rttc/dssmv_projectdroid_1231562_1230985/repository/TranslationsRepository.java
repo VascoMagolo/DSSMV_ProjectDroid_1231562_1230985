@@ -249,14 +249,14 @@ public class TranslationsRepository {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/translations"))
                         .newBuilder()
                         .addQueryParameter("id", "eq." + translationId)
-                        .build();
+                        .build(); // building the query searching for the translationID
 
                 JSONObject bodyJson = new JSONObject();
                 bodyJson.put("is_favorite", isFavorite);
                 RequestBody body = RequestBody.create(
                         bodyJson.toString(),
                         MediaType.parse("application/json")
-                );
+                ); // building the request body
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -265,9 +265,9 @@ public class TranslationsRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .addHeader("Content-Type", "application/json")
                         .addHeader("Prefer", "return=minimal")
-                        .build();
+                        .build(); // building the request (PATCH)
 
-                Response response = client.newCall(request).execute();
+                Response response = client.newCall(request).execute(); // making the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {

@@ -14,14 +14,14 @@ import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.TranslateAPI_K
 public class ImageRepository {
     private final OkHttpClient client;
     public ImageRepository() {
-        client = new OkHttpClient.Builder()
+        client = new OkHttpClient.Builder() // increasing the timeout time of the client
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .build();
     }
 
-    public interface OCRCallback {
+    public interface OCRCallback { // Callback for OCR method
         void onSuccess(String extractedText);
         void onError(Exception e);
     }
@@ -35,20 +35,20 @@ public class ImageRepository {
                                 "photo.jpg",
                                 RequestBody.create(imageBytes, MediaType.parse("image/jpeg"))
                         )
-                        .build();
+                        .build(); // building the request body
 
                 Request request = new Request.Builder()
                         .url("https://ocr43.p.rapidapi.com/v1/results")
                         .post(body)
                         .addHeader("x-rapidapi-key", TranslateAPI_KEY)
                         .addHeader("x-rapidapi-host", "ocr43.p.rapidapi.com")
-                        .build();
+                        .build(); // building the request for the API
 
                 Response response = client.newCall(request).execute();
                 String json = response.body().string();
 
                 JSONObject jsonObject = new JSONObject(json);
-                String extractedText = jsonObject
+                String extractedText = jsonObject // getting the text extracted from the api
                         .getJSONArray("results")
                         .getJSONObject(0)
                         .getJSONArray("entities")
@@ -68,5 +68,5 @@ public class ImageRepository {
                 callback.onError(e);
             }
         }).start();
-    }
+    } // method that call the OCR API and get the text from an image
 }
