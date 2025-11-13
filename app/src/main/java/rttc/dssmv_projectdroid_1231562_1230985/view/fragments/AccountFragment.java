@@ -19,24 +19,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
-import rttc.dssmv_projectdroid_1231562_1230985.view.ConversationHistoryActivity;
+import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.ImageHistoryActivity;
+import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 
 public class AccountFragment extends Fragment {
+
     private AccountViewModel viewModel;
     private SessionManager sessionManager;
     private TextView textGreeting;
-    private String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
-    private String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
+
+    private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
     @Nullable
     @Override
@@ -53,25 +54,31 @@ public class AccountFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(AccountViewModel.class);
         sessionManager = new SessionManager(requireContext());
         textGreeting = view.findViewById(R.id.textGreeting);
+
         MaterialButton btnHistory = view.findViewById(R.id.btnHistory);
+        MaterialButton btnImageHistory = view.findViewById(R.id.btnImageHistory);
+        MaterialButton btnTranslationHistory = view.findViewById(R.id.btnHistory);
         MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
         MaterialButton btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
         MaterialButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
-        MaterialButton btnImageHistory = view.findViewById(R.id.btnImageHistory);
-
 
         updateGreeting();
 
-
         btnHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ConversationHistoryActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(getActivity(), TranslationHistoryActivity.class));
         });
 
-        btnImageHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ImageHistoryActivity.class);
-            startActivity(intent);
-        });
+        if (btnImageHistory != null) {
+            btnImageHistory.setOnClickListener(v -> {
+                startActivity(new Intent(getActivity(), ImageHistoryActivity.class));
+            });
+        }
+
+        if (btnTranslationHistory != null) {
+            btnTranslationHistory.setOnClickListener(v -> {
+                startActivity(new Intent(getActivity(), TranslationHistoryActivity.class));
+            });
+        }
 
         btnEditProfile.setOnClickListener(v -> showUpdateProfileDialog());
 
@@ -177,18 +184,15 @@ public class AccountFragment extends Fragment {
     private void updateGreeting() {
         User user = sessionManager.getUser();
         if (user != null && textGreeting != null) {
-            String displayName = user.getName();
-            if (displayName == null || displayName.isEmpty()) {
-                displayName = user.getEmail();
-            }
+            String displayName = (user.getName() == null || user.getName().isEmpty())
+                    ? user.getEmail()
+                    : user.getName();
             textGreeting.setText(getTimeOfDayGreeting(displayName));
         }
     }
 
     private String getTimeOfDayGreeting(String displayName) {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         if (hour >= 5 && hour < 12) {
             return "Good Morning, " + displayName + "! 👋";
         } else if (hour >= 12 && hour < 18) {

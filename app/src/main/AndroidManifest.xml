@@ -35,7 +35,7 @@
         </activity>
         <activity android:name=".view.MainActivity" />
         <activity android:name=".view.RegisterActivity" />
-        <activity android:name=".view.ConversationHistoryActivity"/>
+        <activity android:name=".view.TranslationHistoryActivity"/>
         <activity android:name=".view.ImageHistoryActivity"/>
         <provider
                 android:name="androidx.core.content.FileProvider"
