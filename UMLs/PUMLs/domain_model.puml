@@ -27,7 +27,7 @@ package "Domain" {
     +String preferredLanguage
   }
 
-  class Conversation {
+  class translation {
     +String id
     +String userId
     +String originalText
@@ -44,6 +44,6 @@ package "Domain" {
     +String language
   }
 
-  User "1" -- "0.*" Conversation : owns
+  User "1" -- "0.*" translation : owns
 }
 @enduml

@@ -6,14 +6,14 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import rttc.dssmv_projectdroid_1231562_1230985.model.Conversation;
+import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
 import rttc.dssmv_projectdroid_1231562_1230985.model.TtsRequest;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationRepository;
 
 public class BilingualViewModel extends AndroidViewModel {
 
     private final TranslationRepository translationRepository;
-    private final ConversationHistoryViewModel historyViewModel;
+    private final TranslationHistoryViewModel historyViewModel;
 
     private final MutableLiveData<String> _textForLangA = new MutableLiveData<>();
     public LiveData<String> getTextForLangA() { return _textForLangA; }
@@ -37,7 +37,7 @@ public class BilingualViewModel extends AndroidViewModel {
     public BilingualViewModel(@NonNull Application application) {
         super(application);
         translationRepository = new TranslationRepository();
-        historyViewModel = new ConversationHistoryViewModel(application);
+        historyViewModel = new TranslationHistoryViewModel(application);
     }
 
     public void translateText(String spokenText, String sourceLang, String targetLang) {
@@ -76,13 +76,13 @@ public class BilingualViewModel extends AndroidViewModel {
     }
 
     private void saveToHistory(String original, String translated, String sourceLang, String targetLang) {
-        Conversation conversation = new Conversation(
+        Translation translation = new Translation(
                 null,
                 original,
                 translated,
                 sourceLang,
                 targetLang
         );
-        historyViewModel.saveConversation(conversation, getApplication().getApplicationContext());
+        historyViewModel.savetranslation(translation, getApplication().getApplicationContext());
     }
 }
