@@ -24,7 +24,7 @@ package model {
     +String preferredLanguage
   }
 
-  class Conversation {
+  class Translation {
     +String id
     +String userId
     +String originalText
@@ -82,10 +82,10 @@ package repository {
     +void onError(Exception e)
   }
 
-  class ConversationRepository {
-    +LiveData<List<Conversation>> getConversations()
-    +void loadConversations(Context context)
-    +void saveConversation(Conversation c, Context context)
+  class TranslationRepository {
+    +LiveData<List<Translation>> getTranslations()
+    +void loadTranslations(Context context)
+    +void saveTranslation(Translation c, Context context)
   }
 
   class PhraseRepository {
@@ -119,7 +119,7 @@ package repository {
 
   AuthRepository ..> utils.SessionManager : uses
   AccountRepository ..> utils.SessionManager : uses
-  ConversationRepository ..> utils.SessionManager : uses
+  TranslationRepository ..> utils.SessionManager : uses
   PhraseRepository ..> exceptions.ApiException : throws
   TranslationRepository ..> exceptions.NetworkException : throws
   ImageRepository ..> exceptions.ApiException : throws
@@ -142,7 +142,7 @@ package viewmodel {
     +void deleteUserAccount(Context context)
   }
 
-  class ConversationViewModel {
+  class TranslationViewModel {
     +LiveData<String> recognizedText
     +LiveData<String> translatedText
     +void startListening(String targetLang)
@@ -161,8 +161,8 @@ package viewmodel {
     +void translatePhrase(String phrase, String target)
   }
 
-  class ConversationHistoryViewModel {
-    +LiveData<List<Conversation>> conversations
+  class TranslationHistoryViewModel {
+    +LiveData<List<Translation>> Translations
     +void loadHistory(Context context)
   }
 
@@ -170,13 +170,13 @@ package viewmodel {
   LoginViewModel ..> repository.AuthRepository
   RegisterViewModel ..> repository.AuthRepository
   AccountViewModel ..> repository.AccountRepository
-  ConversationViewModel ..> repository.TranslationRepository
-  ConversationViewModel ..> repository.ConversationRepository
+  TranslationViewModel ..> repository.TranslationRepository
+  TranslationViewModel ..> repository.TranslationRepository
   ImageViewModel ..> repository.ImageRepository
   ImageViewModel ..> repository.TranslationRepository
   PhraseViewModel ..> repository.PhraseRepository
   PhraseViewModel ..> repository.TranslationRepository
-  ConversationHistoryViewModel ..> repository.ConversationRepository
+  TranslationHistoryViewModel ..> repository.TranslationRepository
 }
 
 package view {
@@ -184,36 +184,36 @@ package view {
     class LoginActivity
     class RegisterActivity
     class MainActivity
-    class ConversationHistoryActivity
+    class TranslationHistoryActivity
   }
 
   folder "fragments" {
-    class ConversationFragment
+    class TranslationFragment
     class ImageFragment
     class PhrasesFragment
     class AccountFragment
   }
 
   package adapters {
-    class ConversationAdapter
+    class TranslationAdapter
     class PhraseAdapter
   }
 
   activities.LoginActivity ..> viewmodel.LoginViewModel
   activities.RegisterActivity ..> viewmodel.RegisterViewModel
-  activities.ConversationHistoryActivity ..> viewmodel.ConversationHistoryViewModel
-  fragments.ConversationFragment ..> viewmodel.ConversationViewModel
+  activities.TranslationHistoryActivity ..> viewmodel.TranslationHistoryViewModel
+  fragments.TranslationFragment ..> viewmodel.TranslationViewModel
   fragments.ImageFragment ..> viewmodel.ImageViewModel
   fragments.PhrasesFragment ..> viewmodel.PhraseViewModel
   fragments.AccountFragment ..> viewmodel.AccountViewModel
 
-  activities.MainActivity ..> fragments.ConversationFragment : hosts
+  activities.MainActivity ..> fragments.TranslationFragment : hosts
   activities.MainActivity ..> fragments.ImageFragment : hosts
   activities.MainActivity ..> fragments.PhrasesFragment : hosts
   activities.MainActivity ..> fragments.AccountFragment : hosts
 
   adapters.PhraseAdapter ..> model.GenericPhrase
-  adapters.ConversationAdapter ..> model.Conversation
+  adapters.TranslationAdapter ..> model.Translation
 
   activities.LoginActivity ..> utils.AuthUiHelper : uses
   activities.RegisterActivity ..> utils.AuthUiHelper : uses

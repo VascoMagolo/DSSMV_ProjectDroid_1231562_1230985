@@ -21,14 +21,14 @@ participant "User" as User
 box "Application Layer" #F8F8F8
     participant "ImageFragment (View)" as View
     participant "ImageViewModel" as VM
-    participant "ConversationHistoryViewModel" as HistoryVM
+    participant "ImageHistoryViewModel" as HistoryVM
     participant "Android Camera App" as CameraApp
 end box
 
 box "Repository Layer" #F8F8F8
     participant "ImageRepository" as IR
     participant "TranslationRepository" as TR
-    participant "ConversationRepository" as CR
+    participant "ImageHistoryRepository" as CR
 end box
 
 box "External Systems" #F8F8F8
@@ -67,13 +67,14 @@ deactivate VM
 
 View -> User : display "Hello" and "Olá"
 
-View -> HistoryVM : saveConversation(Conversation{...})
+View -> VM : (Após tradução)
+VM -> HistoryVM : saveImageHistory(ImageHistory{...})
 activate HistoryVM
-HistoryVM -> CR : saveConversation(Conversation, context)
+HistoryVM -> CR : saveImageHistory(ImageHistory, context)
 activate CR
-CR -> DB : POST /rest/v1/conversations
+CR -> DB : POST /rest/v1/image_history
 DB --> CR : 201 Created
-CR --> HistoryVM : postValue(true)
+CR --> HistoryVM : (Atualiza LiveData)
 deactivate CR
 deactivate HistoryVM
 
