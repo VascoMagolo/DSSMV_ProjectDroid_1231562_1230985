@@ -18,16 +18,18 @@ skinparam sequence {
 
 participant "User" as User
 
+participant "User" as User
+
 box "Application Layer" #F8F8F8
-    participant "ConversationFragment (View)" as View
-    participant "ConversationViewModel" as VM
-    participant "ConversationHistoryViewModel" as HistoryVM
+    participant "TranslationFragment (View)" as View
+    participant "TranslationViewModel" as VM
+    participant "TranslationHistoryViewModel" as HistoryVM
     participant "TTS Engine (Android)" as TTS
 end box
 
 box "Repository Layer" #F8F8F8
     participant "TranslationRepository" as TR
-    participant "ConversationRepository" as CR
+    participant "TranslationsRepository" as CR
 end box
 
 box "External Systems" #F8F8F8
@@ -60,14 +62,14 @@ alt Scenario: User speaks to translate
     View -> View : updateTranslatedText()
     View -> View : updateOriginalLang()
 
-    View -> View : tryToSaveConversation()
+    View -> View : tryToSaveTranslation()
 
     opt If user is registered and all data is present
-        View -> HistoryVM : saveConversation(Conversation)
+        View -> HistoryVM : saveTranslation(Translation)
         activate HistoryVM
-        HistoryVM -> CR : saveConversation(Conversation, context)
+        HistoryVM -> CR : saveTranslation(Translation, context)
         activate CR
-        CR -> DB : POST /rest/v1/conversations
+        CR -> DB : POST /rest/v1/translations
         DB --> CR : 201 Created
         CR --> HistoryVM : postValue(true)
         deactivate CR

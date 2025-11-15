@@ -27,15 +27,15 @@ package "Domain" {
     +String preferredLanguage
   }
 
-  class translation {
-    +String id
-    +String userId
-    +String originalText
-    +String translatedText
-    +String sourceLanguage
-    +String targetLanguage
-    +Date timestamp
-  }
+  class Translation {
+      +String id
+      +String userId
+      +String originalText
+      +String translatedText
+      +String sourceLanguage
+      +String targetLanguage
+      +Date timestamp
+    }
 
   class GenericPhrase {
     +String id
@@ -44,6 +44,6 @@ package "Domain" {
     +String language
   }
 
-  User "1" -- "0.*" translation : owns
+  User "1" -- "0.*" Translation : owns
 }
 @enduml
