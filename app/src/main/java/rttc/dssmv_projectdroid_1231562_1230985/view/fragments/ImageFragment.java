@@ -39,11 +39,16 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ImageViewModel;
 
+/**
+ * Fragment that is responsible for handling image capture from camera or gallery,
+ * and also displaying OCR and translation
+ */
 public class ImageFragment extends Fragment {
-
+    // Request code for the camera intent
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    // Request code for getting camera permission
     private static final int REQUEST_CAMERA_PERMISSION = 100;
-
+    // Request code for gallery intent
     private static final int REQUEST_GALLERY_IMAGE = 2;
 
     private ImageView imgPreview;
@@ -135,6 +140,10 @@ public class ImageFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Launches an intent to get permissions
+     */
     private void openCamera() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -200,6 +209,10 @@ public class ImageFragment extends Fragment {
         }
     }
 
+    /**
+     * Display image in ImageView, compresses it to JPEG byte array
+     * @param bitmap the image bitmap captured
+     */
     private void processBitmap(Bitmap bitmap) {
         imgPreview.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

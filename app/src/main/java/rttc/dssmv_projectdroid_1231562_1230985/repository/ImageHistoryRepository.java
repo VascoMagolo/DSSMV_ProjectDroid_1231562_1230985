@@ -21,8 +21,12 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.ImageHistory;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
+/**
+ * Manages image translation history, CRUD operations for image translation
+ * and upload the actual image files to supabase
+ */
 public class ImageHistoryRepository {
-    private static final String TAG = "ImageHistoryRepository";
+    private static final String TAG = "ImageHistoryRepository"; // tag for error log
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
@@ -30,7 +34,7 @@ public class ImageHistoryRepository {
     private final MutableLiveData<List<ImageHistory>> _imageHistory = new MutableLiveData<>();
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
 
-    public ImageHistoryRepository() {
+    public ImageHistoryRepository() { // by default OkHttp waits has a timeout of 10 seconds which sometimes is not enough, this initializes it with a 30 second timeout
         client = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
@@ -40,6 +44,11 @@ public class ImageHistoryRepository {
         _imageHistory.setValue(new ArrayList<>());
     }
 
+    /**
+     * Get the image history for the currently logged user from the table 'image_history'
+     * on supabase, results are ordered by timestamp descending
+     * @param context the context used to access Session Manager
+     */
     public void loadImageHistory(Context context) {
         new Thread(() -> {
             try {
@@ -81,6 +90,11 @@ public class ImageHistoryRepository {
         }).start();
     }
 
+    /**
+     * Saves a new record to the supabase image history
+     * @param imageHistory ImageHistory object containing URLs, text and language
+     * @param context context used for SessionManager
+     */
     public void saveImageHistory(ImageHistory imageHistory, Context context) {
         new Thread(() -> {
             try {
@@ -140,6 +154,11 @@ public class ImageHistoryRepository {
         }).start();
     }
 
+    /**
+     * Deletes a record from the supabase image history
+     * @param imageHistory the ImageHistory object to delete
+     * @param context context used for SessionManager
+     */
     public void deleteImageHistory(ImageHistory imageHistory, Context context) {
         new Thread(() -> {
             try {
@@ -178,6 +197,7 @@ public class ImageHistoryRepository {
         }).start();
     }
 
+
     private List<ImageHistory> parseImageHistoryResponse(String jsonResponse) throws JSONException {
         List<ImageHistory> historyList = new ArrayList<>();
         JSONArray jsonArray = new JSONArray(jsonResponse);
@@ -197,7 +217,7 @@ public class ImageHistoryRepository {
             imageHistory.setTargetLanguage(jsonObject.optString("target_language"));
 
             String timestampStr = jsonObject.optString("timestamp");
-            if (timestampStr != null && !timestampStr.isEmpty()) {
+            if (!timestampStr.isEmpty()) {
                 try {
                     java.util.Date timestamp = isoFormat.parse(timestampStr);
                     imageHistory.setTimestamp(timestamp);
@@ -213,11 +233,22 @@ public class ImageHistoryRepository {
 
         return historyList;
     }
+
     public interface ImageUploadCallback {
+        /**
+         * called on successful upload
+         * @param imageUrl public URL of the image
+         */
         void onSuccess(String imageUrl);
         void onError(Exception e);
-    }
+    } // call back interface for image upload operation
 
+    /**
+     * Uploads image to supabase
+     * @param imageBytes Compressed byte array of the image
+     * @param fileName  unique file name for the object
+     * @param callback Callback that notifies success or error
+     */
     public void uploadImage(byte[] imageBytes, String fileName, ImageUploadCallback callback) {
         new Thread(() -> {
             try {

@@ -2,6 +2,10 @@ package rttc.dssmv_projectdroid_1231562_1230985.model;
 
 import java.util.Date;
 
+/**
+ * Represents a single translation record
+ * Data class to model the translations before its saved/store in supabase
+ */
 public class Translation {
     private String id;
     private String userId;

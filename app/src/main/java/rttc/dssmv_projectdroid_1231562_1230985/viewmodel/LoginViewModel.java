@@ -10,7 +10,10 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
 import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
-
+/**
+ * View model for the login
+ * Manages login states, handling user inputs validation and communication
+ */
 public class LoginViewModel extends ViewModel {
 
     private final AuthRepository authRepository;

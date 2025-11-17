@@ -24,6 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Activity that
+ */
 public class TranslationHistoryActivity extends AppCompatActivity {
 
     private TranslationHistoryViewModel viewModel;

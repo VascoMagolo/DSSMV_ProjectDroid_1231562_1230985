@@ -21,6 +21,11 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
+/**
+ * Manages CRUD operations for saved translation records in supabase.
+ * Different from {@link TranslationRepository} which handles the act of translating
+ * the via an external API
+ */
 public class TranslationsRepository {
 
     private final OkHttpClient client;
@@ -55,6 +60,12 @@ public class TranslationsRepository {
                 .build();
     }
 
+    /**
+     * Saves a new translation record to supabase
+     * @param translation Translation object to save
+     * @param context Context for Session manager
+     * @param callback Callback for success or error
+     */
     public void saveTranslation(Translation translation, Context context, SaveCallback callback) {
         new Thread(() -> {
             try {
@@ -243,6 +254,14 @@ public class TranslationsRepository {
         }).start();
     } // method to delete previous user translation
 
+
+    /**
+     * Updates the 'is_favorite' boolean for a specific translation record
+     * Uses a patch request
+     * @param translationId The ID of the translation to update the status
+     * @param isFavorite New favorite status ( true or false )
+     * @param callback Callback for success or error
+     */
     public void updateFavoriteStatus(String translationId, boolean isFavorite, FavoriteCallback callback) {
         new Thread(() -> {
             try {

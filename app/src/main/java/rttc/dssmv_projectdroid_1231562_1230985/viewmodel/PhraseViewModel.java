@@ -16,6 +16,11 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for PhrasesFragment
+ * Manages both generic and personal quick phrases
+ * Uses MediatorLiveData to join this 2 types of phrases into one list
+ */
 public class PhraseViewModel extends ViewModel {
 
     private final PhraseRepository phraseRepository;
@@ -51,8 +56,14 @@ public class PhraseViewModel extends ViewModel {
                 combineLists(genericList, _userPhrases.getValue()));
         _allPhrases.addSource(_userPhrases, userList ->
                 combineLists(_genericPhrases.getValue(), userList));
-    }
+    } // constructor that sets MediatorLiveData and calls combineLists()
 
+
+    /**
+     * Merges the 2 phrases lists into one, prioritizes userLists by adding it first
+     * @param genericList List of generic quick phrases
+     * @param userList List of user personal quick phrases
+     */
     private void combineLists(List<GenericPhrase> genericList, List<GenericPhrase> userList) {
         List<GenericPhrase> combined = new ArrayList<>();
         if (userList != null) {
@@ -63,6 +74,7 @@ public class PhraseViewModel extends ViewModel {
         }
         _allPhrases.postValue(combined);
     }
+
 
     public void loadAllPhrases(Context context, String language) {
         loadGenericPhrases(language);
@@ -109,6 +121,13 @@ public class PhraseViewModel extends ViewModel {
             }
         });
     }
+
+    /**
+     * Saves a new user created phrase
+     * It detects first the language on the phrase to assign a language code before saving it
+     * @param context Context of the repository
+     * @param phrase The GenericPhrase object to save
+     */
     public void saveUserPhrase(Context context, GenericPhrase phrase) {
         translationRepository.detectAndTranslate(phrase.getText(), "en", new TranslationRepository.TranslationCallback() {
             @Override
