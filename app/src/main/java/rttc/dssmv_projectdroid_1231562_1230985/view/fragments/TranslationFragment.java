@@ -23,6 +23,13 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationHistoryViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationViewModel;
 
+
+/**
+ * Provides the UI for STT translation feature
+ * Works with the {@link TranslationViewModel} to manage the STT (Speech-to-Text)
+ * lifecycle. It also manages the {@link TextToSpeech} (TTS) engine for audio playback
+ * and handles the {@link Manifest.permission#RECORD_AUDIO} permission request.
+ */
 public class TranslationFragment extends Fragment {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
