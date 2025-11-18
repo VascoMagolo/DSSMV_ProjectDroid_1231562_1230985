@@ -12,7 +12,10 @@ import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 
 import java.util.List;
-
+/**
+ * RecyclerView Adapter for displaying {@link GenericPhrase} objects in the PhrasesFragment.
+ * This adapter handles two types of click events (translate and delete)
+ */
 public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseViewHolder> {
 
     private List<GenericPhrase> phraseList;
@@ -49,6 +52,14 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseView
         return new PhraseViewHolder(view);
     }
 
+
+    /**
+     * Binds data to the ViewHolder.
+     * This method contains the logic to know the differences between generic and user quick phrase,
+     * The delete button is only shown if {@code phrase.isUserPhrase()} is true.
+     * @param holder   The ViewHolder which should be updated.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull PhraseViewHolder holder, int position) {
         GenericPhrase phrase = phraseList.get(position);
