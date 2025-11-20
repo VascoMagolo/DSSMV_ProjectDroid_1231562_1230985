@@ -16,18 +16,29 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+/**
+ * Repository to Get/Fetch generic phrases from Supabase
+ * Connects to the 'generic_phrases' table
+ * Read only phrases for all users
+ */
 public class PhraseRepository {
     private final OkHttpClient client = new OkHttpClient();
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
 
-    private final MutableLiveData<List<GenericPhrase>> _phrases = new MutableLiveData<>();
+    // LiveData for phrases and error messages
     private final MutableLiveData<String> _errorMessage =  new MutableLiveData<>();
 
+    /** Callback interface for loading a list of generic phrases */
     public interface LoadPhrasesCallback {
         void onSuccess(List<GenericPhrase> phrases);
         void onError(Exception e);
     }
+    /**
+     * Fetches/Loads generic phrases from Supabase, filtered by language
+     * @param language Language to filter phrases
+     * @param callback Returns list of generic phrases or error
+     */
     public void loadGenericPhrases(String language, LoadPhrasesCallback callback) {
         new Thread(() -> {
             try{
@@ -74,26 +85,6 @@ public class PhraseRepository {
                 callback.onError(e);
             }
         }).start();
-    }
-
-    private static @NotNull List<GenericPhrase> getGenericPhrases(String responseBody) throws JSONException {
-        List<GenericPhrase> phrases = new ArrayList<>();
-        JSONArray phrasesArray = new JSONArray(responseBody);
-
-        for(int i = 0; i < phrasesArray.length(); i++){
-            JSONObject object = phrasesArray.getJSONObject(i);
-            GenericPhrase phrase = new GenericPhrase();
-            phrase.setId(object.getString("id"));
-            phrase.setLanguage(object.getString("language"));
-            phrase.setCategory(object.getString("category"));
-            phrase.setText(object.getString("text"));
-            phrases.add(phrase);
-        }
-        return phrases;
-    }
-
-    public LiveData<List<GenericPhrase>> getPhrases() {
-        return  _phrases;
     }
     public LiveData<String> getErrorMessage() {
         return _errorMessage;

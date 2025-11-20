@@ -12,6 +12,9 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.ImageHistory;
 import rttc.dssmv_projectdroid_1231562_1230985.repository.ImageHistoryRepository;
 
+/**
+ * ViewModel for ImageFragment
+ */
 public class ImageViewModel extends AndroidViewModel {
     private final ImageRepository imageRepository;
     private final TranslationRepository translationRepository;
@@ -34,6 +37,11 @@ public class ImageViewModel extends AndroidViewModel {
         imageHistoryRepository = new ImageHistoryRepository();
     }
 
+    /**
+     * Entry point to start image processing flow
+     * @param imageBytes the JPG byte array from the image
+     * @param targetLang target language code for translation
+     */
     public void processImage(byte[] imageBytes, String targetLang) {
         isLoading.postValue(true);
         String fileName = "image_" + System.currentTimeMillis() + ".jpg";
@@ -71,6 +79,12 @@ public class ImageViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     *
+     * @param imageBytes Raw image bytes
+     * @param targetLang Target language code
+     * @param imageUrl The public url of image to be saved in supabase
+     */
     public void processImageInternal(byte[] imageBytes, String targetLang, String imageUrl) {
         String currentText = extractedText.getValue();
         if (currentText != null && !currentText.isEmpty()) {
@@ -98,6 +112,14 @@ public class ImageViewModel extends AndroidViewModel {
         }
     }
 
+
+    /**
+     * Takes extracted OCR text and sends it to TranslationRepository
+     * On success calls 'saveToImageHistory'
+     * @param text text to be translated
+     * @param targetLang Target language code
+     * @param imageUrl Image url passed through for image saving
+     */
     private void translateText(String text, String targetLang, String imageUrl) {
         translationRepository.detectAndTranslate(text, targetLang, new TranslationRepository.TranslationCallback() {
             @Override
@@ -115,6 +137,9 @@ public class ImageViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Saves the complete translation record to the supabase via the ImageHistoryRepository
+     */
     private void saveToImageHistory(String extractedText, String translatedText, String targetLang, String imageUrl) {
         ImageHistory imageHistory = new ImageHistory(
                 imageUrl,

@@ -19,19 +19,27 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
+/**
+ * Repository class for managing user-specific phrases in Supabase.
+ * Handles CRUD operations for user phrases.
+ * Private to the user
+ */
 public class UserPhraseRepository {
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
+    /** Callback for loading a list of phrases */
     public interface LoadUserPhrasesCallback {
         void onSuccess(List<GenericPhrase> userPhrases);
         void onError(Exception e);
     }
+    /** Callback for saving phrase */
     public interface SaveCallback {
         void onSuccess();
         void onError(Exception e);
     }
+    /** Callback for deleting phrase */
     public interface DeleteCallback {
         void onSuccess();
         void onError(Exception e);
@@ -44,6 +52,13 @@ public class UserPhraseRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
+
+    /**
+     * Fetches/Loads user personal phrases from Supabase, filtered by language
+     * @param context Context to get current user id
+     * @param initialLanguage Language to filter phrases
+     * @param callback Returns list of user phrases or error
+     */
     public void loadUserPhrases(Context context, String initialLanguage, LoadUserPhrasesCallback callback) {
         new Thread(() -> {
             try {
@@ -102,6 +117,12 @@ public class UserPhraseRepository {
         }).start();
     }
 
+    /**
+     * Saves a user personal phrase to Supabase on 'user_phrases' table
+     * @param phrase Phrase to save
+     * @param context Context to get current user id
+     * @param callback Callback that reports success or error
+     */
     public void saveUserPhrase(GenericPhrase phrase, Context context, SaveCallback callback) {
         new Thread(() -> {
             try {
@@ -144,6 +165,12 @@ public class UserPhraseRepository {
         }).start();
     }
 
+    /**
+     * Checks that the phrase belongs to the user and deletes it from Supabase on 'user_phrases' table
+     * @param phrase Phrase to delete
+     * @param context Context to get current user id
+     * @param callback Callback that reports success or error
+     */
     public void deleteUserPhrase(GenericPhrase phrase, Context context, DeleteCallback callback) {
         new Thread(() -> {
             try {

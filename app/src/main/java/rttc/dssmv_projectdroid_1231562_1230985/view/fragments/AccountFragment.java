@@ -26,10 +26,15 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.ImageHistoryActivity;
-import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 
+/**
+ * Fragment that displays user account management screen
+ * Users can navigate through their history of translations, update their profile,
+ * logout and delete their account.
+ * Communicates with AccountViewModel for delete/update operations
+ */
 public class AccountFragment extends Fragment {
 
     private AccountViewModel viewModel;
@@ -54,8 +59,6 @@ public class AccountFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(AccountViewModel.class);
         sessionManager = new SessionManager(requireContext());
         textGreeting = view.findViewById(R.id.textGreeting);
-
-        MaterialButton btnHistory = view.findViewById(R.id.btnHistory);
         MaterialButton btnImageHistory = view.findViewById(R.id.btnImageHistory);
         MaterialButton btnTranslationHistory = view.findViewById(R.id.btnHistory);
         MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
@@ -63,10 +66,6 @@ public class AccountFragment extends Fragment {
         MaterialButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
 
         updateGreeting();
-
-        btnHistory.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), TranslationHistoryActivity.class));
-        });
 
         if (btnImageHistory != null) {
             btnImageHistory.setOnClickListener(v -> {
@@ -93,6 +92,10 @@ public class AccountFragment extends Fragment {
         setupObservers();
     }
 
+    /**
+     * Reacts to results from account CRUD operations by showing toasts
+     * Communicates with the LiveData from ViewModel
+     */
     private void setupObservers() {
         viewModel.getDeleteSuccess().observe(getViewLifecycleOwner(), success -> {
             if (success) {
@@ -115,6 +118,10 @@ public class AccountFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays a material alert dialog that allows the user to update is profile
+     * the dialog is prefilled with the user data from SharedPrefs
+     */
     private void showUpdateProfileDialog() {
         User currentUser = sessionManager.getUser();
         if (currentUser == null) {
@@ -161,6 +168,10 @@ public class AccountFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Displays a material alert dialog that allows the user to delete is profile
+     * and to prevent accidental account deletion
+     */
     private void showDeleteConfirmationDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Delete Account?")
@@ -172,6 +183,9 @@ public class AccountFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Navigates the user back to LoginActivity and also clears navigation stack
+     */
     private void navigateToLogin() {
         if (getActivity() == null) return;
 
@@ -181,6 +195,10 @@ public class AccountFragment extends Fragment {
         getActivity().finish();
     }
 
+    /**
+     * Updates user greeting TextView with a time appropriate message
+     * uses 'getTimeOfDayGreeting()' to get the proper greeting
+     */
     private void updateGreeting() {
         User user = sessionManager.getUser();
         if (user != null && textGreeting != null) {

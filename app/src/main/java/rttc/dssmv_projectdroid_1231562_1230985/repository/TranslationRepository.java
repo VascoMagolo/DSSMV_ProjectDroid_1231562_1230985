@@ -9,15 +9,29 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 
 import java.net.SocketTimeoutException;
 
+/**
+ * Manages translation operation by integration 'TranslationAI' from RapidAPI
+ * Manages both translation and language detection
+ */
 public class TranslationRepository {
 
     private final OkHttpClient client = new OkHttpClient();
 
+
+    /**
+     * Callback interface for asynchronous translation operations.
+     */
     public interface TranslationCallback {
         void onSuccess(String translatedText, String detectedLang);
         void onError(Exception e);
     }
 
+    /**
+     * Detects the language of the input text and translates it to the target language.
+     * @param text text to be translated and detected
+     * @param targetLanguageCode target language code for translation
+     * @param callback callback to handle success or error
+     */
     public void detectAndTranslate(String text, String targetLanguageCode, TranslationCallback callback) {
         detectLang(text, new LanguageDetectionCallback() {
             @Override
@@ -42,6 +56,13 @@ public class TranslationRepository {
         });
     }
 
+    /**
+     * Translates text from source language to target language.
+     * @param text text to be translated
+     * @param sourceLang Source language code
+     * @param targetLang Target language code
+     * @param callback callback to handle success or error
+     */
     public void translate(String text, String sourceLang, String targetLang, TranslationCallback callback) {
         translateText(text, sourceLang, targetLang, new TranslationApiCallback() {
             @Override

@@ -24,6 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Activity that displays user Translation history
+ * Allows users to delete, share, and favorite past translations
+ */
 public class TranslationHistoryActivity extends AppCompatActivity {
 
     private TranslationHistoryViewModel viewModel;
@@ -46,9 +50,13 @@ public class TranslationHistoryActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(TranslationHistoryViewModel.class);
         adapter.setOntranslationClickListener(this::showtranslationDetailsDialog);
         setupObservers();
-        viewModel.loadtranslations(this);
+        viewModel.loadTranslations(this);
     }
 
+    /**
+     * Uses ViewModel livedata,
+     * updates the adapter with the list of translations
+     */
     private void setupObservers() {
         viewModel.gettranslations().observe(this, translations -> {
             adapter.updatetranslations(translations);
@@ -78,6 +86,12 @@ public class TranslationHistoryActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * Shows a MaterialAlterDialog
+     * Shows detailed information about the translation
+     * @param translation The Translation object that the user clicked.
+     */
     private void showtranslationDetailsDialog(Translation translation) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_translation_details, null);
         TextView textOriginal = dialogView.findViewById(R.id.dialog_text_original);
@@ -132,6 +146,10 @@ public class TranslationHistoryActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * Shows a simple confirmation dialog before deleting a translation.
+     * @param translation The translation to be deleted.
+     */
     private void showDeleteConfirmationDialog(Translation translation) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Delete translation?")
@@ -142,6 +160,12 @@ public class TranslationHistoryActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
+    /**
+     * Updates the tint of the favorite icon based on its active state
+     * @param button     The MaterialButton acting as the icon button.
+     * @param isFavorite The new favorite status.
+     */
     private void updateFavoriteIcon(MaterialButton button, boolean isFavorite) {
         try {
             if (isFavorite) {

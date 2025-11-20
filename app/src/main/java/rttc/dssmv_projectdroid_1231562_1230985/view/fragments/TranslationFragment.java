@@ -23,6 +23,13 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationHistoryViewModel;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.TranslationViewModel;
 
+
+/**
+ * Provides the UI for STT translation feature
+ * Works with the {@link TranslationViewModel} to manage the STT (Speech-to-Text)
+ * lifecycle. It also manages {@link TextToSpeech} (TTS) for audio playback
+ * and handles {@link Manifest.permission#RECORD_AUDIO} permission request.
+ */
 public class TranslationFragment extends Fragment {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
@@ -79,6 +86,9 @@ public class TranslationFragment extends Fragment {
         });
     }
 
+    /**
+     * Initializes TTS
+     */
     private void setupTts() {
         tts = new TextToSpeech(requireContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -87,6 +97,11 @@ public class TranslationFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Fills the target language dropdown
+     * Pre-selects the user favorite language from SessionManager
+     */
     private void setupTargetLanguageMenu() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
@@ -106,6 +121,7 @@ public class TranslationFragment extends Fragment {
             targetLang = languageCodes[position];
         });
     }
+
     private String getLanguageNameFromCode(String langCode) {
         if (langCode == null) {
             return languages[1];
@@ -119,6 +135,10 @@ public class TranslationFragment extends Fragment {
         return languages[1];
     }
 
+    /**
+     * Utilizes {@link TranslationViewModel} LiveData to update the UI
+     * Updates textviews when new text arrives and calls {@code tryToSaveTranslation()}
+     */
     private void setupObservers() {
         viewModel.recognizedText.observe(getViewLifecycleOwner(), text -> {
             txtRecognized.setText(text);
@@ -135,7 +155,7 @@ public class TranslationFragment extends Fragment {
 
         viewModel.originalLanguage.observe(getViewLifecycleOwner(), lang -> {
             if (lang != null && !lang.isEmpty()) {
-                txtOriginalLang.setText("Detetado: " + lang.toUpperCase());
+                txtOriginalLang.setText("Detected: " + lang.toUpperCase());
                 pendingDetectedLanguage = lang;
                 tryToSavetranslation();
                 if (ttsReady) {
@@ -151,6 +171,11 @@ public class TranslationFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Checks if {@link Manifest.permission#RECORD_AUDIO} permission is granted
+     * @return true if permission granted, false otherwise (requests permission)
+     */
     private boolean checkAudioPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -160,6 +185,7 @@ public class TranslationFragment extends Fragment {
         }
         return true;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -175,6 +201,12 @@ public class TranslationFragment extends Fragment {
         }
     }
 
+    /**
+     * Tries to save translation to history via historyViewModel
+     * Called by the observers and will only execute when the 3 required information
+     * (original text, translated text, detected language) are available
+     * It also clears up pending data
+     */
     private void tryToSavetranslation() {
         if (pendingOriginalText != null &&
                 pendingTranslatedText != null &&
@@ -193,7 +225,7 @@ public class TranslationFragment extends Fragment {
                         sourceLang,
                         targetLang
                 );
-                historyViewModel.savetranslation(translation, requireContext());
+                historyViewModel.saveTranslation(translation, requireContext());
 
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error saving translation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -205,6 +237,10 @@ public class TranslationFragment extends Fragment {
         }
     }
 
+    /**
+     * Fragment lifecycle method
+     * Makes sure that TTS is stopped and shutdown
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();

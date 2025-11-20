@@ -39,11 +39,16 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.ImageViewModel;
 
+/**
+ * Fragment that is responsible for handling image capture from camera or gallery,
+ * and also displaying OCR and translation
+ */
 public class ImageFragment extends Fragment {
-
+    // Request code for the camera intent
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    // Request code for getting camera permission
     private static final int REQUEST_CAMERA_PERMISSION = 100;
-
+    // Request code for gallery intent
     private static final int REQUEST_GALLERY_IMAGE = 2;
 
     private ImageView imgPreview;
@@ -135,6 +140,10 @@ public class ImageFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Launches an intent to get permissions
+     */
     private void openCamera() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -162,11 +171,17 @@ public class ImageFragment extends Fragment {
         }
     }
 
+    /** Opens the device gallery to select an image */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_GALLERY_IMAGE);
     }
 
+    /**
+     * Creates a temporary image file to store the captured photo
+     * @return File object representing the created image file
+     * @throws IOException if file creation fails
+     */
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -200,6 +215,10 @@ public class ImageFragment extends Fragment {
         }
     }
 
+    /**
+     * Display image in ImageView, compresses it to JPEG byte array
+     * @param bitmap the image bitmap captured
+     */
     private void processBitmap(Bitmap bitmap) {
         imgPreview.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

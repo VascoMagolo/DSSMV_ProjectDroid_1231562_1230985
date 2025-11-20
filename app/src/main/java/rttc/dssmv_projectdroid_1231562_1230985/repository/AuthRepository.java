@@ -18,6 +18,11 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 
+/**
+ * Handles all login/authentication and register operations,
+ * Does this by communicating with the Supabase backend,
+ * DOES NOT use supabase auth but instead direct queries
+ */
 public class AuthRepository {
 
     private final OkHttpClient client;

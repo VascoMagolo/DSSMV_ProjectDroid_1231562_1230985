@@ -7,6 +7,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.*;
 
+/**
+ * Main Activity hosting the bottom navigation and fragments * :
+ * - {@link TranslationFragment}: Voice translation
+ * - {@link ImageFragment}: Image translation
+ * - {@link PhrasesFragment}: Generic phrases
+ * - {@link AccountFragment}: User account management
+ * - {@link BilingualFragment}: Bilingual mode
+ * Handles guest user logic by removing account option
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -14,14 +23,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // checks if user is guest, passed from login activity
         boolean isGuestUser = getIntent().getBooleanExtra("IS_GUEST", false);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
+        // if user is guest removes account option
         if (isGuestUser) {
             bottomNav.getMenu().removeItem(R.id.nav_account);
         }
 
+        // Main navigation logic
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selected = null;
             if (item.getItemId() == R.id.nav_voice) {
@@ -44,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        // On app start, loads default fragment
+        // Prevents blank screen on first load
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new BilingualFragment())

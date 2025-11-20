@@ -16,11 +16,16 @@ import java.util.Locale;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.ImageHistory;
 
+/**
+ * RecyclerView Adapter for displaying image translation history items
+ * Each item has a thumbnail, text preview, timestamp, and target language
+ */
 public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapter.ImageHistoryViewHolder> {
 
     private List<ImageHistory> imageHistoryList;
     private OnImageHistoryClickListener listener;
 
+    /** Interface for handling clicks on image history items */
     public interface OnImageHistoryClickListener {
         void onImageHistoryClick(ImageHistory imageHistory);
     }
@@ -63,6 +68,10 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
         return imageHistoryList != null ? imageHistoryList.size() : 0;
     }
 
+    /**
+     * ViewHolder class for binding image history data to item views
+     * Uses Picasso for image loading and formatting for date display
+     */
     static class ImageHistoryViewHolder extends RecyclerView.ViewHolder {
         private final TextView textPreview;
         private final TextView textTimestamp;
@@ -78,12 +87,19 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
             imgThumbnail = itemView.findViewById(R.id.img_history_thumbnail);
         }
 
+        /**
+         * Binds an ImageHistory object to the item views
+         * Truncates preview text and formats timestamp
+         * Loads image thumbnail using Picasso
+         * @param imageHistory The ImageHistory object to bind
+         */
         public void bind(ImageHistory imageHistory) {
             String preview = imageHistory.getExtractedText();
             if (preview != null && preview.length() > 50) {
                 preview = preview.substring(0, 50) + "...";
             }
             textPreview.setText(preview != null ? preview : "No text extracted");
+
 
             if (imageHistory.getTimestamp() != null) {
                 textTimestamp.setText(dateFormat.format(imageHistory.getTimestamp()));
@@ -94,7 +110,7 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
             String targetLang = imageHistory.getTargetLanguage() != null ?
                     imageHistory.getTargetLanguage().toUpperCase() : "EN";
             textLanguage.setText("To: " + targetLang);
-
+            // Using Picasso to load image URL asynchronously
             if (imageHistory.getImageUrl() != null && !imageHistory.getImageUrl().isEmpty()) {
                 Picasso.get()
                         .load(imageHistory.getImageUrl())
