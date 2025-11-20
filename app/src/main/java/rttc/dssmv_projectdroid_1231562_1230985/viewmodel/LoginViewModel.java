@@ -31,6 +31,14 @@ public class LoginViewModel extends ViewModel {
         authRepository = new AuthRepository();
     }
 
+    /**
+     * Initiates the login process
+     * Validates input, validates _isLoading and _errorMessage states and calls AuthRepository
+     * Results are handled via callbacks updating LiveData states
+     * @param context Context needed for repository operations
+     * @param email User email input
+     * @param password User password input
+     */
     public void login(Context context, String email, String password) {
         if (!validateInput(email, password)) {
             return;
@@ -63,6 +71,11 @@ public class LoginViewModel extends ViewModel {
         });
     }
 
+    /**
+     * Validates user input for login
+     * Posts error messages to _errorMessage LiveData if validation fails
+     * @return true if input is valid, false otherwise
+     */
     private boolean validateInput(String email, String password) {
         if (email.isEmpty() || password.isEmpty()) {
             _errorMessage.setValue("Please fill all the fields");
@@ -77,7 +90,6 @@ public class LoginViewModel extends ViewModel {
         _errorMessage.setValue(null);
         return true;
     }
-
     public void onNavigationComplete() {
         _navigateToHome.setValue(false);
     }

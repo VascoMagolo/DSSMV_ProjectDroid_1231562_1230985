@@ -32,6 +32,10 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.BilingualViewModel;
 
+/**
+ * Fragments for a split-screen interface for bilingual conversations
+ * Allows user to speak in either two selected languages, and have the text translate and spoken in the other language
+ */
 public class BilingualFragment extends Fragment {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
@@ -41,13 +45,11 @@ public class BilingualFragment extends Fragment {
     private TextToSpeech tts;
     private boolean ttsReady = false;
 
-    private String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
-    private String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
+    private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
     private AutoCompleteTextView autoCompleteLangA, autoCompleteLangB;
     private TextView textLangA, textLangB;
-    private FloatingActionButton fabMicA, fabMicB;
-    private ImageButton btnSwapLangs;
 
     private SessionManager sessionManager;
     private String langA = "pt";
@@ -71,20 +73,22 @@ public class BilingualFragment extends Fragment {
         autoCompleteLangB = view.findViewById(R.id.autoComplete_lang_b);
         textLangA = view.findViewById(R.id.text_lang_a);
         textLangB = view.findViewById(R.id.text_lang_b);
-        fabMicA = view.findViewById(R.id.fab_mic_a);
-        fabMicB = view.findViewById(R.id.fab_mic_b);
-        btnSwapLangs = view.findViewById(R.id.btn_swap_langs);
+        FloatingActionButton fabMicA = view.findViewById(R.id.fab_mic_a);
+        FloatingActionButton fabMicB = view.findViewById(R.id.fab_mic_b);
+        ImageButton btnSwapLangs = view.findViewById(R.id.btn_swap_langs);
 
         setupTts();
         setupLanguageMenus();
         setupObservers();
 
+        // Listener Mic A
         fabMicA.setOnClickListener(v -> {
             currentSourceLang = langA;
             currentTargetLang = langB;
             startSpeechToText();
         });
 
+        // Listener Mic B
         fabMicB.setOnClickListener(v -> {
             currentSourceLang = langB;
             currentTargetLang = langA;
@@ -127,6 +131,9 @@ public class BilingualFragment extends Fragment {
         });
     }
 
+    /**
+     * Iniciates STT intent
+     */
     private void startSpeechToText() {
         if (!checkAudioPermission()) {
             return;
@@ -144,6 +151,18 @@ public class BilingualFragment extends Fragment {
         }
     }
 
+    /**
+     * Handles Speech Recognizer Intent result
+     * If successful, passes the spoken text to the ViewModel for translation
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -187,22 +206,33 @@ public class BilingualFragment extends Fragment {
         });
     }
 
+    /**
+     * Swap source and target languages
+     */
     private void swapLanguages() {
+        // Swaps language codes
         String tempLang = langA;
         langA = langB;
         langB = tempLang;
 
+        // Swaps 'dropdown' text
         String textA = autoCompleteLangA.getText().toString();
         String textB = autoCompleteLangB.getText().toString();
         autoCompleteLangA.setText(textB, false);
         autoCompleteLangB.setText(textA, false);
 
+        // Swaps content of text view so no conversation history is lost
         String contentA = textLangA.getText().toString();
         String contentB = textLangB.getText().toString();
         textLangA.setText(contentB);
         textLangB.setText(contentA);
     }
 
+    /**
+     * Uses TTS to speak provided text
+     * @param text The text to speak
+     * @param locale the Locale/language of the text
+     */
     private void speak(String text, Locale locale) {
         if (ttsReady && text != null && !text.isEmpty()) {
             tts.setLanguage(locale);

@@ -11,11 +11,19 @@ import java.util.List;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
 
+/**
+ * RecyclerView Adapter to display a list of {@link Translation} objects
+ * Used in {@link rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity}
+ * Displays original text, translated text, languages code and favorite indicator
+ */
 public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.TranslationViewHolder> {
 
     private List<Translation> translationList;
     private OntranslationClickListener listener;
 
+    /**
+     * Handles click events on a history record
+     */
     public interface OntranslationClickListener {
         void ontranslationClick(Translation translation);
     }
@@ -36,6 +44,10 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
         return new TranslationViewHolder(view);
     }
 
+    /**
+     * Joins/Binds translation data to the ViewHolder
+     * Handles language code format (e.g., "PT -> EN") also handles favorite icon
+     */
     @Override
     public void onBindViewHolder(@NonNull TranslationViewHolder holder, int position) {
         Translation translation = translationList.get(position);
@@ -43,11 +55,13 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
         holder.txtOriginal.setText(translation.getOriginalText());
         holder.txtTranslatedItem.setText(translation.getTranslatedText());
 
+        // Formats target and source language
         String langs = (translation.getSourceLanguage() != null ? translation.getSourceLanguage().toUpperCase() : "AUTO")
                 + " → "
                 + (translation.getTargetLanguage() != null ? translation.getTargetLanguage().toUpperCase() : "EN");
         holder.txtLangs.setText(langs);
 
+        // Toggles favorite icon visibility based on translation.getFavorite value
         if (translation.getFavorite()) {
             holder.iconFavoriteStar.setVisibility(View.VISIBLE);
 ;
@@ -64,8 +78,13 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
     @Override
     public int getItemCount() {
         return translationList.size();
-    }
+    } // returns the translation history list size
 
+    /**
+     * Updates the list of translations and updates the RecyclerView
+     * Must be called when the data is changed in the ViewModel
+     * @param newList a new list of translation objects
+     */
     public void updatetranslations(List<Translation> newList) {
         this.translationList = newList;
         notifyDataSetChanged();

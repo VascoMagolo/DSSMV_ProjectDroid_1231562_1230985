@@ -14,14 +14,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // checks if user is guest, passed from login activity
         boolean isGuestUser = getIntent().getBooleanExtra("IS_GUEST", false);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
+        // if user is guest removes account option
         if (isGuestUser) {
             bottomNav.getMenu().removeItem(R.id.nav_account);
         }
 
+        // Main navigation logic
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selected = null;
             if (item.getItemId() == R.id.nav_voice) {
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        // On app start, loads default fragment
+        // Prevents blank screen on first load
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new BilingualFragment())

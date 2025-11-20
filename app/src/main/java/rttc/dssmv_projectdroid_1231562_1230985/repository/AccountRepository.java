@@ -20,14 +20,21 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.SUPABASE_KEY;
 import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.SUPABASE_URL;
 
+/**
+ * Repository class for managing user account data with Supabase backend.
+ * Provides methods to delete and update user accounts.
+ * Unlike {@link AuthRepository}, this class does not handle authentication tasks.
+ */
 public class AccountRepository {
 
     private final OkHttpClient client;
 
+    /** Callback interface for delete operation */
     public interface DeleteCallback {
         void onSuccess();
         void onError(Exception e);
     } // Callback interface for delete operation
+
 
     public AccountRepository() {
         this.client = new OkHttpClient.Builder()
@@ -36,6 +43,14 @@ public class AccountRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     } // Initialize OkHttpClient with timeouts
+
+    /**
+     * Method to delete user account from Supabase
+     * Local session is cleared upon successful deletion
+     * @param context Context used to access SharedPreferences
+     * @param userId ID (UUID) of the user to be deleted
+     * @param callback Callback to handle success or error
+     */
     public void deleteAccount(Context context, String userId, DeleteCallback callback) {
         new Thread(() -> {
             try {
@@ -82,11 +97,19 @@ public class AccountRepository {
         }).start();
     } // Method to delete user account
 
+    /** Callback interface for update operation */
     public interface UpdateCallback {
         void onSuccess();
         void onError(Exception e);
     } // Callback interface for update operation
 
+    /**
+     * Method to update user account details on Supabase using PATCH request
+     * Local session is updated upon successful update
+     * @param context Context used to access SharedPreferences
+     * @param user User object containing updated details
+     * @param callback Callback to handle success or error
+     */
     public void updateAccount(Context context, User user, UpdateCallback callback) {
         String userId = user.getId();
         new Thread(() -> {

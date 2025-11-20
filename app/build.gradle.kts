@@ -86,3 +86,20 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
 }
+// Javadoc generation task
+tasks.register<Javadoc>("generateJavadoc") {
+    source(android.sourceSets.getByName("main").java.srcDirs)
+    classpath += project.files(android.bootClasspath)
+    android.applicationVariants.forEach { variant ->
+        if (variant.name == "debug") {
+            classpath += variant.javaCompileProvider.get().classpath
+            classpath += project.files(variant.javaCompileProvider.get().destinationDirectory)
+        }
+    }
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:none", "-quiet")
+        encoding = "UTF-8"
+        charSet = "UTF-8"
+    }
+    exclude("**/R.java", "**/BuildConfig.java")
+}
