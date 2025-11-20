@@ -50,7 +50,7 @@ public class TranslationHistoryActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(TranslationHistoryViewModel.class);
         adapter.setOntranslationClickListener(this::showtranslationDetailsDialog);
         setupObservers();
-        viewModel.loadtranslations(this);
+        viewModel.loadTranslations(this);
     }
 
     /**

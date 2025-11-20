@@ -7,6 +7,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.view.fragments.*;
 
+/**
+ * Main Activity hosting the bottom navigation and fragments * :
+ * - {@link TranslationFragment}: Voice translation
+ * - {@link ImageFragment}: Image translation
+ * - {@link PhrasesFragment}: Generic phrases
+ * - {@link AccountFragment}: User account management
+ * - {@link BilingualFragment}: Bilingual mode
+ * Handles guest user logic by removing account option
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

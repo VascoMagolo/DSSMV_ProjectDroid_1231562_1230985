@@ -90,11 +90,8 @@ public class TranslationViewModel extends AndroidViewModel {
             /**
              * Called when STT has a result
              * The recognized text is posted on {@code _recognizedText}
-             * and translation is initiated by calling {@linkplain  translate}
-             * @param results the recognition results. To retrieve the results in {@code
-             *        ArrayList<String>} format use {@link Bundle#getStringArrayList(String)} with
-             *        {@link SpeechRecognizer#RESULTS_RECOGNITION} as a parameter. A float array of
-             *        confidence values might also be given in {@link SpeechRecognizer#CONFIDENCE_SCORES}.
+             * and translation is initiated by calling {@link TranslationViewModel#translate(String, String)}
+             * @param results the recognition results.
              */
             @Override
             public void onResults(Bundle results) {

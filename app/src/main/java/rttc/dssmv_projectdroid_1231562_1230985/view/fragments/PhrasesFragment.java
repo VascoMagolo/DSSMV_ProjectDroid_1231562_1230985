@@ -33,6 +33,11 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.view.adapters.PhraseAdapter;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.PhraseViewModel;
 
+/**
+ * Fragment that has the responsibility of displaying and managing a phrase collection,
+ * Combines generic phrases and user-specific phrases into a single list.
+ * Allows users to add, delete, and translate phrases.
+ */
 public class PhrasesFragment extends Fragment {
 
     private PhraseViewModel viewModel;
@@ -43,7 +48,6 @@ public class PhrasesFragment extends Fragment {
 
     private AutoCompleteTextView autoCompleteSourceLanguage;
     private AutoCompleteTextView autoCompleteTargetLanguage;
-    private FloatingActionButton fabAddPhrase;
 
     private CardView cardTranslation;
     private TextView textOriginalPhrase;
@@ -52,8 +56,8 @@ public class PhrasesFragment extends Fragment {
     private String currentTranslatedPhrase = "";
     private String targetLang = "en";
 
-    private String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
-    private String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
+    private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
+    private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +75,7 @@ public class PhrasesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewPhrases);
         autoCompleteSourceLanguage = view.findViewById(R.id.autoCompleteSourceLanguage);
         autoCompleteTargetLanguage = view.findViewById(R.id.autoCompleteTargetLanguage);
-        fabAddPhrase = view.findViewById(R.id.fab_add_phrase);
+        FloatingActionButton fabAddPhrase = view.findViewById(R.id.fab_add_phrase);
 
         cardTranslation = view.findViewById(R.id.cardTranslation);
         textOriginalPhrase = view.findViewById(R.id.textOriginalPhrase);
@@ -84,12 +88,14 @@ public class PhrasesFragment extends Fragment {
         setupTargetLanguageMenu();
         setupTranslationCard();
         setupObservers();
+        // Hide add phrase button if no user is logged in
         User currentUser = sessionManager.getUser();
         if (currentUser == null) {
             fabAddPhrase.setVisibility(View.GONE);
         }
 
         fabAddPhrase.setOnClickListener(v -> showAddPhraseDialog());
+        // Load initial phrases based on preferred language or default to Portuguese
         String initialLang = getLanguageCodeFromSelection(autoCompleteSourceLanguage.getText().toString());
         if(initialLang.isEmpty()) initialLang = "pt";
         viewModel.loadAllPhrases(requireContext(), initialLang);
@@ -103,21 +109,28 @@ public class PhrasesFragment extends Fragment {
         });
     }
 
+    /**
+     * Initializes the RecyclerView with PhraseAdapter.
+     * Sets up click listeners for phrase selection and deletion.
+     */
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new PhraseAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
+        // Phrase click listener for translation
         adapter.setOnPhraseClickListener(phrase -> {
             textOriginalPhrase.setText(phrase.getText());
             textTranslatedPhrase.setText("Translating...");
             cardTranslation.setVisibility(View.VISIBLE);
             viewModel.translatePhrase(phrase.getText(), targetLang);
         });
-        adapter.setOnDeleteClickListener(phrase -> {
-            showDeleteConfirmationDialog(phrase);
-        });
+        adapter.setOnDeleteClickListener(this::showDeleteConfirmationDialog);
     }
 
+    /**
+     * Configures the source language dropdown menu.
+     * Triggers reload of phrases when a new language is selected.
+     */
     private void setupSourceLanguageMenu() {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 requireContext(),
@@ -131,10 +144,15 @@ public class PhrasesFragment extends Fragment {
         autoCompleteSourceLanguage.setOnItemClickListener((parent, view, position, id) -> {
             String selectedLanguage = languageCodes[position];
             viewModel.loadPhrasesForLanguage(requireContext(), selectedLanguage);
+            // Hide translation card when source language changes
             cardTranslation.setVisibility(View.GONE);
         });
     }
 
+    /**
+     * Configures the target language dropdown menu.
+     * Sets default target language based on user preference or defaults to English.
+     */
     private void setupTargetLanguageMenu() {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 requireContext(),
@@ -180,6 +198,10 @@ public class PhrasesFragment extends Fragment {
         return "";
     }
 
+    /**
+     * Uses TextToSpeech (TTS) to speak the translated text.
+     * @param translatedText The text to be spoken.
+     */
     private void speakTranslation(String translatedText) {
         if (tts != null && translatedText != null && !translatedText.isEmpty()) {
             Locale targetLocale = new Locale(targetLang);
@@ -188,6 +210,9 @@ public class PhrasesFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets up LiveData observers to update UI based on ViewModel changes.
+     */
     private void setupObservers() {
         viewModel.getAllPhrases().observe(getViewLifecycleOwner(), phrases -> {
             if (phrases != null && !phrases.isEmpty()) {
@@ -220,6 +245,11 @@ public class PhrasesFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays a dialog to add a new personal phrase.
+     * Validates input and saves the phrase via ViewModel on Supabase.
+     * Defaults category to "Personal" if none is provided.
+     */
     private void showAddPhraseDialog() {
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_add_phrases, null, false);

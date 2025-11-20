@@ -27,7 +27,6 @@ public class PhraseRepository {
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
 
     // LiveData for phrases and error messages
-    private final MutableLiveData<List<GenericPhrase>> _phrases = new MutableLiveData<>();
     private final MutableLiveData<String> _errorMessage =  new MutableLiveData<>();
 
     /** Callback interface for loading a list of generic phrases */

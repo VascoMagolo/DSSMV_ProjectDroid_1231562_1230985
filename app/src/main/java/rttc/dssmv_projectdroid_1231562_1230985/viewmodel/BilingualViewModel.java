@@ -39,8 +39,8 @@ public class BilingualViewModel extends AndroidViewModel {
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     public LiveData<String> getErrorMessage() { return _errorMessage; }
 
-    private String langA = "pt";
-    private String langB = "en";
+    private final String langA = "pt";
+    private final String langB = "en";
 
 
     public BilingualViewModel(@NonNull Application application) {
@@ -110,6 +110,6 @@ public class BilingualViewModel extends AndroidViewModel {
                 sourceLang,
                 targetLang
         );
-        historyViewModel.savetranslation(translation, getApplication().getApplicationContext());
+        historyViewModel.saveTranslation(translation, getApplication().getApplicationContext());
     }
 }

@@ -26,7 +26,6 @@ import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.ImageHistoryActivity;
-import rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.view.LoginActivity;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.AccountViewModel;
 

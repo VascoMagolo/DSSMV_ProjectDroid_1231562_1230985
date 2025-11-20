@@ -14,10 +14,15 @@ import rttc.dssmv_projectdroid_1231562_1230985.repository.TranslationsRepository
 import rttc.dssmv_projectdroid_1231562_1230985.exceptions.AuthException;
 import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 
+/**
+ * View Model for {@link rttc.dssmv_projectdroid_1231562_1230985.view.TranslationHistoryActivity}
+ * Manages translation history operations: load, save, delete, update favorite status
+ */
 public class TranslationHistoryViewModel extends AndroidViewModel {
 
     private final TranslationsRepository translationsRepository;
 
+    // LiveData for translations and operation results
     private final MutableLiveData<List<Translation>> _translations = new MutableLiveData<>();
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> _saveSuccess = new MutableLiveData<>();
@@ -45,8 +50,12 @@ public class TranslationHistoryViewModel extends AndroidViewModel {
         return _favoriteUpdateSuccess;
     }
 
-
-    public void loadtranslations(Context context) {
+    /**
+     * Loads all translations from the current user's history
+     * Updates {@code _translations} LiveData on success
+     * @param context Context for repository operations
+     */
+    public void loadTranslations(Context context) {
         translationsRepository.loadTranslations(context, new TranslationsRepository.LoadCallback() {
             @Override
             public void onSuccess(List<Translation> translations) {
@@ -60,12 +69,18 @@ public class TranslationHistoryViewModel extends AndroidViewModel {
         });
     }
 
-    public void savetranslation(Translation translation, Context context) {
+    /**
+     * Saves a new translation to the user's history
+     * Updates {@code _saveSuccess} LiveData on operation result
+     * @param translation Translation to save
+     * @param context Context for repository operations
+     */
+    public void saveTranslation(Translation translation, Context context) {
         translationsRepository.saveTranslation(translation, context, new TranslationsRepository.SaveCallback() {
             @Override
             public void onSuccess() {
                 _saveSuccess.postValue(true);
-                loadtranslations(context);
+                loadTranslations(context);
             }
 
             @Override
@@ -76,12 +91,18 @@ public class TranslationHistoryViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Deletes a translation from the user's history
+     * Updates {@code _deleteSuccess} LiveData on operation result
+     * @param translation Translation to delete
+     * @param context Context for repository operations
+     */
     public void deletetranslation(Translation translation, Context context) {
         translationsRepository.deleteTranslation(translation, context, new TranslationsRepository.DeleteCallback() {
             @Override
             public void onSuccess() {
                 _deleteSuccess.postValue(true);
-                loadtranslations(context);
+                loadTranslations(context);
             }
 
             @Override
@@ -92,12 +113,19 @@ public class TranslationHistoryViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Updates the favorite status of a translation
+     * Updates {@code _favoriteUpdateSuccess} LiveData on operation result
+     * @param translationId ID of the translation to update
+     * @param isFavorite New favorite status
+     * @param context Context for repository operations
+     */
     public void updateFavoriteStatus(String translationId, boolean isFavorite, Context context) {
         translationsRepository.updateFavoriteStatus(translationId, isFavorite, new TranslationsRepository.FavoriteCallback() {
             @Override
             public void onSuccess() {
                 _favoriteUpdateSuccess.postValue(true);
-                loadtranslations(context);
+                loadTranslations(context);
             }
 
             @Override
@@ -108,6 +136,12 @@ public class TranslationHistoryViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Handles errors from repository operations
+     * Updates {@code _errorMessage} LiveData with appropriate message
+     * @param e Exception encountered
+     * @param defaultMessage Default message to use for unexpected errors
+     */
     private void handleError(Exception e, String defaultMessage) {
         if (e instanceof AuthException) {
             _errorMessage.postValue(e.getMessage());

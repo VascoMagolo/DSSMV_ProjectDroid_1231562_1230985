@@ -13,6 +13,12 @@ import rttc.dssmv_projectdroid_1231562_1230985.utils.AuthUiHelper;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.LoginViewModel;
 
+/**
+ * Origin Activity that handles user login
+ * Handles user authentication via LoginViewModel with password and email
+ * Also provides navigation to registration and guest access
+ * Checks for existing session and navigates to MainActivity if user is already logged in
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
@@ -20,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Initialize SessionManager to check login status
         SessionManager sessionManager = new SessionManager(this);
         if (sessionManager.isLoggedIn()) {
             navigateToHome();
@@ -39,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
             String password = etPassword.getText().toString();
             viewModel.login(this, email, password);
         });
+        // Setup observers for login process
         AuthUiHelper.setupLoginObservers(this, viewModel, btnLogin, this::navigateToHome);
 
         btnRegister.setOnClickListener(v -> {
@@ -53,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
     }
+    /** Navigates to the MainActivity and clears the back stack */
     private void navigateToHome() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

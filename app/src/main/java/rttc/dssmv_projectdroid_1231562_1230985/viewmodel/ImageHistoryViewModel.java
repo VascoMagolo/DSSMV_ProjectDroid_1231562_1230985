@@ -34,10 +34,6 @@ public class ImageHistoryViewModel extends AndroidViewModel {
         isLoading.setValue(false);
     }
 
-    public void saveImageHistory(ImageHistory imageHistory, Context context) {
-        imageHistoryRepository.saveImageHistory(imageHistory, context);
-    }
-
     /**
      * Deletes a specific record of image history
      * @param imageHistory image history record to delete

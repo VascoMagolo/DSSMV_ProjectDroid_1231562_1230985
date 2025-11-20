@@ -12,6 +12,12 @@ import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.AuthUiHelper;
 import rttc.dssmv_projectdroid_1231562_1230985.viewmodel.RegisterViewModel;
 
+/**
+ * Activity that handles user registration
+ * Collects user details: name, email, password, preferred language
+ * Interacts with {@link RegisterViewModel} to create new account
+ * Uses {@link AuthUiHelper} to manage UI state and navigation after registration
+ */
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText edtName, edtEmail, edtPassword, edtConfirmPassword;
@@ -34,25 +40,28 @@ public class RegisterActivity extends AppCompatActivity {
         edtPreferredLanguage = findViewById(R.id.autoCompletePreferredLanguage);
         Button btnRegister = findViewById(R.id.btnCreate);
         setupLanguageSpinner();
+        // Listener for the register button
         btnRegister.setOnClickListener(v -> {
+            // Gather user inputs
             String name = edtName.getText().toString();
             String email = edtEmail.getText().toString();
             String password = edtPassword.getText().toString();
             String confirmpassword = edtConfirmPassword.getText().toString();
             String selectedLanguageText = edtPreferredLanguage.getText().toString();
             String langCode = getLanguageCodeFromSelection(selectedLanguageText);
-
+            // Trigger registration in ViewModel
             viewModel.register(name, email, password, confirmpassword, langCode);
         });
-
+        // Setup observers for registration result
         AuthUiHelper.setupRegisterObservers(this, viewModel, btnRegister, () -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
             startActivity(intent);
             finish();
         });
     }
+
+    /** Sets up the language selection spinner with predefined languages */
     private void setupLanguageSpinner() {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 this,

@@ -11,6 +11,10 @@ import rttc.dssmv_projectdroid_1231562_1230985.exceptions.NetworkException;
 
 import static rttc.dssmv_projectdroid_1231562_1230985.BuildConfig.TranslateAPI_KEY;
 
+/**
+ * Repository responsible for OCR operations
+ * Communicates with OCR43 API to extracted text content
+ */
 public class ImageRepository {
     private final OkHttpClient client;
     public ImageRepository() {
@@ -25,6 +29,11 @@ public class ImageRepository {
         void onSuccess(String extractedText);
         void onError(Exception e);
     }
+
+    /** Method to extract text from image using OCR43 API
+     * @param imageBytes Byte array of the image
+     * @param callback Callback to handle success or error
+     */
     public void extractTextFromImage(byte[] imageBytes, OCRCallback callback) {
         new Thread(() -> {
             try {

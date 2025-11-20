@@ -12,10 +12,15 @@ import rttc.dssmv_projectdroid_1231562_1230985.repository.AccountRepository;
 import rttc.dssmv_projectdroid_1231562_1230985.utils.SessionManager;
 import rttc.dssmv_projectdroid_1231562_1230985.model.User;
 
-
+/**
+ * View Model for {@link rttc.dssmv_projectdroid_1231562_1230985.view.fragments.AccountFragment}
+ * Handles user account operations: deletion and update
+ * Communicates with {@link AccountRepository} for data operations and exposes LiveData for UI observation
+ */
 public class AccountViewModel extends AndroidViewModel {
 
     private final AccountRepository accountRepository;
+    // LiveData for operation results and error messages
     private final MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> updateSuccess = new MutableLiveData<>();
@@ -29,6 +34,11 @@ public class AccountViewModel extends AndroidViewModel {
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getUpdateSuccess() { return updateSuccess; }
 
+    /**
+     * Deletes the current user's account
+     * Gets user ID from session and calls repository to delete account
+     * @param context Application context for repository operations
+     */
     public void deleteUserAccount(Context context) {
         SessionManager session = new SessionManager(context);
         User user = session.getUser();
@@ -62,6 +72,11 @@ public class AccountViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Updates the user's account information
+     * @param context Context for repository operations
+     * @param user User object with updated information
+     */
     public void updateUserAccount(Context context, User user) {
         if (user == null || user.getId() == null) {
             errorMessage.postValue("User data is invalid.");

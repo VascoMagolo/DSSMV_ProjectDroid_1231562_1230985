@@ -25,6 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity to display the history of image translations
+ * Show list of {@link ImageHistory} items
+ * Users can tap an item to view full details
+ */
 public class ImageHistoryActivity extends AppCompatActivity {
 
     private ImageHistoryViewModel viewModel;
@@ -42,7 +47,7 @@ public class ImageHistoryActivity extends AppCompatActivity {
         setupRecyclerView();
         setupViewModel();
         setupObservers();
-
+        // Triggers data to load when activity starts
         viewModel.loadImageHistory(this);
     }
 
@@ -54,14 +59,16 @@ public class ImageHistoryActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> onBackPressed());
     }
 
+    /**
+     * Sets up the RecyclerView with the ImageHistoryAdapter
+     * and handles item click events to show details dialog
+     */
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ImageHistoryAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnImageHistoryClickListener(imageHistory -> {
-            showImageHistoryDetailsDialog(imageHistory);
-        });
+        adapter.setOnImageHistoryClickListener(this::showImageHistoryDetailsDialog);
     }
 
     private void setupViewModel() {
@@ -93,6 +100,11 @@ public class ImageHistoryActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows a custom dialog with details of the selected ImageHistory item
+     * Includes : larger preview image (with picasso), original text, translated text, language, timestamp
+     * @param imageHistory The ImageHistory item to show details for
+     */
     private void showImageHistoryDetailsDialog(ImageHistory imageHistory) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_image_history_details, null);
 

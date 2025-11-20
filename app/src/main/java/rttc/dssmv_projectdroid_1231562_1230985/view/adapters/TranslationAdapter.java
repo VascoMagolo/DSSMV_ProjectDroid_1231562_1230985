@@ -64,7 +64,6 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
         // Toggles favorite icon visibility based on translation.getFavorite value
         if (translation.getFavorite()) {
             holder.iconFavoriteStar.setVisibility(View.VISIBLE);
-;
         } else {
             holder.iconFavoriteStar.setVisibility(View.GONE);
         }

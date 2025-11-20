@@ -252,8 +252,6 @@ public class ImageHistoryRepository {
     public void uploadImage(byte[] imageBytes, String fileName, ImageUploadCallback callback) {
         new Thread(() -> {
             try {
-                String bucketName = "images";
-
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("file", fileName,

@@ -171,11 +171,17 @@ public class ImageFragment extends Fragment {
         }
     }
 
+    /** Opens the device gallery to select an image */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_GALLERY_IMAGE);
     }
 
+    /**
+     * Creates a temporary image file to store the captured photo
+     * @return File object representing the created image file
+     * @throws IOException if file creation fails
+     */
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";

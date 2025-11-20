@@ -225,7 +225,7 @@ public class TranslationFragment extends Fragment {
                         sourceLang,
                         targetLang
                 );
-                historyViewModel.savetranslation(translation, requireContext());
+                historyViewModel.saveTranslation(translation, requireContext());
 
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error saving translation: " + e.getMessage(), Toast.LENGTH_SHORT).show();

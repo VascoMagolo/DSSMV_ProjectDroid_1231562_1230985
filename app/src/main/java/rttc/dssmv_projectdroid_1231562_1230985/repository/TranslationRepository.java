@@ -26,7 +26,12 @@ public class TranslationRepository {
         void onError(Exception e);
     }
 
-
+    /**
+     * Detects the language of the input text and translates it to the target language.
+     * @param text text to be translated and detected
+     * @param targetLanguageCode target language code for translation
+     * @param callback callback to handle success or error
+     */
     public void detectAndTranslate(String text, String targetLanguageCode, TranslationCallback callback) {
         detectLang(text, new LanguageDetectionCallback() {
             @Override
@@ -51,6 +56,13 @@ public class TranslationRepository {
         });
     }
 
+    /**
+     * Translates text from source language to target language.
+     * @param text text to be translated
+     * @param sourceLang Source language code
+     * @param targetLang Target language code
+     * @param callback callback to handle success or error
+     */
     public void translate(String text, String sourceLang, String targetLang, TranslationCallback callback) {
         translateText(text, sourceLang, targetLang, new TranslationApiCallback() {
             @Override
