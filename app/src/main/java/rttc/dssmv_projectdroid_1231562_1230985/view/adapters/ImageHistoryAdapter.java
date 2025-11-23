@@ -80,8 +80,9 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
         private final TextView textTimestamp;
         private final TextView textLanguage;
         private final ImageView imgThumbnail;
-        // Reuse SimpleDateFormat instance for better performance
-        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault());
+        // Use ThreadLocal for thread-safe SimpleDateFormat access
+        private static final ThreadLocal<SimpleDateFormat> dateFormat = 
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()));
 
         public ImageHistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -106,7 +107,7 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
 
 
             if (imageHistory.getTimestamp() != null) {
-                textTimestamp.setText(dateFormat.format(imageHistory.getTimestamp()));
+                textTimestamp.setText(dateFormat.get().format(imageHistory.getTimestamp()));
             } else {
                 textTimestamp.setText("Date unavailable");
             }

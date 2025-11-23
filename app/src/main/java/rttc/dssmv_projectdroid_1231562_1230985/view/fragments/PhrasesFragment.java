@@ -74,7 +74,7 @@ public class PhrasesFragment extends Fragment {
         
         // Initialize language lookup maps for better performance
         for (int i = 0; i < languages.length; i++) {
-            codeToNameMap.put(languageCodes[i], languages[i]);
+            codeToNameMap.put(languageCodes[i].toLowerCase(), languages[i]);
             nameToCodeMap.put(languages[i], languageCodes[i]);
         }
         
