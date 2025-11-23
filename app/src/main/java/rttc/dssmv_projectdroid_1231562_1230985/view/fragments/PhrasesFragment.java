@@ -23,7 +23,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
@@ -58,6 +60,10 @@ public class PhrasesFragment extends Fragment {
 
     private final String[] languages = {"Português", "English", "Español", "Français", "日本語", "中文", "Deutsch"};
     private final String[] languageCodes = {"pt", "en", "es", "fr", "ja", "zh", "de"};
+    
+    // Cache language mappings for O(1) lookup performance
+    private final Map<String, String> codeToNameMap = new HashMap<>();
+    private final Map<String, String> nameToCodeMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,6 +71,13 @@ public class PhrasesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_phrases, container, false);
         viewModel = new ViewModelProvider(this).get(PhraseViewModel.class);
         sessionManager = new SessionManager(requireContext());
+        
+        // Initialize language lookup maps for better performance
+        for (int i = 0; i < languages.length; i++) {
+            codeToNameMap.put(languageCodes[i], languages[i]);
+            nameToCodeMap.put(languages[i], languageCodes[i]);
+        }
+        
         return view;
     }
 
@@ -181,21 +194,13 @@ public class PhrasesFragment extends Fragment {
     }
 
     private String getLanguageNameFromCode(String langCode) {
-        for (int i = 0; i < languageCodes.length; i++) {
-            if (languageCodes[i].trim().equalsIgnoreCase(langCode.trim())) {
-                return languages[i];
-            }
-        }
-        return languages[0];
+        String name = codeToNameMap.get(langCode.trim().toLowerCase());
+        return name != null ? name : languages[0];
     }
 
     private String getLanguageCodeFromSelection(String selectedText) {
-        for (int i = 0; i < languages.length; i++) {
-            if (languages[i].equals(selectedText)) {
-                return languageCodes[i];
-            }
-        }
-        return "";
+        String code = nameToCodeMap.get(selectedText);
+        return code != null ? code : "";
     }
 
     /**

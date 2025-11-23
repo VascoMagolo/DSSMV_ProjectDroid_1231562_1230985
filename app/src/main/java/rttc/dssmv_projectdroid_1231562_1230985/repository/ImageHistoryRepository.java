@@ -30,6 +30,7 @@ public class ImageHistoryRepository {
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
+    private SessionManager sessionManager;
 
     private final MutableLiveData<List<ImageHistory>> _imageHistory = new MutableLiveData<>();
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
@@ -43,6 +44,17 @@ public class ImageHistoryRepository {
 
         _imageHistory.setValue(new ArrayList<>());
     }
+    
+    public ImageHistoryRepository(Context context) {
+        client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+
+        _imageHistory.setValue(new ArrayList<>());
+        this.sessionManager = new SessionManager(context);
+    }
 
     /**
      * Get the image history for the currently logged user from the table 'image_history'
@@ -51,8 +63,9 @@ public class ImageHistoryRepository {
      */
     public void loadImageHistory(Context context) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
@@ -74,7 +87,7 @@ public class ImageHistoryRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -86,6 +99,10 @@ public class ImageHistoryRepository {
 
             } catch (Exception e) {
                 _errorMessage.postValue("Error loading image history: " + e.getMessage());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
@@ -97,8 +114,9 @@ public class ImageHistoryRepository {
      */
     public void saveImageHistory(ImageHistory imageHistory, Context context) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
@@ -139,7 +157,7 @@ public class ImageHistoryRepository {
                         .addHeader("Prefer", "return=minimal")
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
@@ -150,6 +168,10 @@ public class ImageHistoryRepository {
 
             } catch (Exception e) {
                 _errorMessage.postValue("Error saving image: " + e.getMessage());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
@@ -161,8 +183,9 @@ public class ImageHistoryRepository {
      */
     public void deleteImageHistory(ImageHistory imageHistory, Context context) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null || imageHistory.getId() == null) {
@@ -182,7 +205,7 @@ public class ImageHistoryRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
@@ -193,6 +216,10 @@ public class ImageHistoryRepository {
 
             } catch (Exception e) {
                 _errorMessage.postValue("Error deleting image: " + e.getMessage());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
@@ -251,6 +278,7 @@ public class ImageHistoryRepository {
      */
     public void uploadImage(byte[] imageBytes, String fileName, ImageUploadCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
@@ -265,7 +293,7 @@ public class ImageHistoryRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -278,6 +306,10 @@ public class ImageHistoryRepository {
             } catch (Exception e) {
                 Log.e(TAG, "Error uploading image to Supabase", e);
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }

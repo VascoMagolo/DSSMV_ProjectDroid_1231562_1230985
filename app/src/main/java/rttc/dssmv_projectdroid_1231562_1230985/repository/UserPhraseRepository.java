@@ -28,6 +28,7 @@ public class UserPhraseRepository {
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
+    private SessionManager sessionManager;
 
     /** Callback for loading a list of phrases */
     public interface LoadUserPhrasesCallback {
@@ -52,6 +53,15 @@ public class UserPhraseRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
+    
+    public UserPhraseRepository(Context context) {
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+        this.sessionManager = new SessionManager(context);
+    }
 
     /**
      * Fetches/Loads user personal phrases from Supabase, filtered by language
@@ -61,8 +71,9 @@ public class UserPhraseRepository {
      */
     public void loadUserPhrases(Context context, String initialLanguage, LoadUserPhrasesCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
@@ -85,7 +96,7 @@ public class UserPhraseRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -113,6 +124,10 @@ public class UserPhraseRepository {
                 callback.onError(new ApiException("Data Error: Failed to read user phrases."));
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
@@ -125,8 +140,9 @@ public class UserPhraseRepository {
      */
     public void saveUserPhrase(GenericPhrase phrase, Context context, SaveCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
                 if (user == null || user.getId() == null) {
                     callback.onError(new AuthException("User not logged in."));
@@ -153,7 +169,7 @@ public class UserPhraseRepository {
                         .addHeader("Prefer", "return=minimal")
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 if (response.isSuccessful()) {
                     callback.onSuccess();
                 } else {
@@ -161,6 +177,10 @@ public class UserPhraseRepository {
                 }
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
@@ -173,8 +193,9 @@ public class UserPhraseRepository {
      */
     public void deleteUserPhrase(GenericPhrase phrase, Context context, DeleteCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
                 if (user == null || user.getId() == null) {
                     callback.onError(new AuthException("User not logged in."));
@@ -199,7 +220,7 @@ public class UserPhraseRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 if (response.isSuccessful()) {
                     callback.onSuccess();
                 } else {
@@ -207,6 +228,10 @@ public class UserPhraseRepository {
                 }
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }

@@ -6,12 +6,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.ImageHistory;
@@ -38,9 +40,10 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
         this.listener = listener;
     }
 
-    public void updateImageHistory(List<ImageHistory> imageHistoryList) {
-        this.imageHistoryList = imageHistoryList;
-        notifyDataSetChanged();
+    public void updateImageHistory(List<ImageHistory> newImageHistoryList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ImageHistoryDiffCallback(this.imageHistoryList, newImageHistoryList));
+        this.imageHistoryList = newImageHistoryList;
+        diffResult.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -77,7 +80,8 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
         private final TextView textTimestamp;
         private final TextView textLanguage;
         private final ImageView imgThumbnail;
-        private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault());
+        // Reuse SimpleDateFormat instance for better performance
+        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault());
 
         public ImageHistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -122,6 +126,47 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
             } else {
                 imgThumbnail.setImageResource(R.drawable.ic_photo_placeholder);
             }
+        }
+    }
+
+    /**
+     * DiffUtil.Callback for calculating the difference between two lists of image history items
+     */
+    private static class ImageHistoryDiffCallback extends DiffUtil.Callback {
+        private final List<ImageHistory> oldList;
+        private final List<ImageHistory> newList;
+
+        public ImageHistoryDiffCallback(List<ImageHistory> oldList, List<ImageHistory> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList != null ? oldList.size() : 0;
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList != null ? newList.size() : 0;
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            ImageHistory oldItem = oldList.get(oldItemPosition);
+            ImageHistory newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getId(), newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            ImageHistory oldItem = oldList.get(oldItemPosition);
+            ImageHistory newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getImageUrl(), newItem.getImageUrl()) &&
+                   Objects.equals(oldItem.getExtractedText(), newItem.getExtractedText()) &&
+                   Objects.equals(oldItem.getTranslatedText(), newItem.getTranslatedText()) &&
+                   Objects.equals(oldItem.getTargetLanguage(), newItem.getTargetLanguage()) &&
+                   Objects.equals(oldItem.getTimestamp(), newItem.getTimestamp());
         }
     }
 }

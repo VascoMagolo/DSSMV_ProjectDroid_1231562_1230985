@@ -6,8 +6,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
+import java.util.Objects;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.Translation;
 
@@ -80,13 +82,55 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
     } // returns the translation history list size
 
     /**
-     * Updates the list of translations and updates the RecyclerView
+     * Updates the list of translations and updates the RecyclerView efficiently using DiffUtil
      * Must be called when the data is changed in the ViewModel
      * @param newList a new list of translation objects
      */
     public void updatetranslations(List<Translation> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TranslationDiffCallback(this.translationList, newList));
         this.translationList = newList;
-        notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    /**
+     * DiffUtil.Callback for calculating the difference between two lists of translations
+     */
+    private static class TranslationDiffCallback extends DiffUtil.Callback {
+        private final List<Translation> oldList;
+        private final List<Translation> newList;
+
+        public TranslationDiffCallback(List<Translation> oldList, List<Translation> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            Translation oldItem = oldList.get(oldItemPosition);
+            Translation newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getId(), newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            Translation oldItem = oldList.get(oldItemPosition);
+            Translation newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getOriginalText(), newItem.getOriginalText()) &&
+                   Objects.equals(oldItem.getTranslatedText(), newItem.getTranslatedText()) &&
+                   Objects.equals(oldItem.getFavorite(), newItem.getFavorite()) &&
+                   Objects.equals(oldItem.getSourceLanguage(), newItem.getSourceLanguage()) &&
+                   Objects.equals(oldItem.getTargetLanguage(), newItem.getTargetLanguage());
+        }
     }
     static class TranslationViewHolder extends RecyclerView.ViewHolder {
         TextView txtOriginal, txtTranslatedItem, txtLangs;
