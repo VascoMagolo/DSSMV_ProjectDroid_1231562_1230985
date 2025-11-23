@@ -31,6 +31,7 @@ public class TranslationsRepository {
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
+    private SessionManager sessionManager;
 
     public interface SaveCallback { // Callback interface for Saving the translation
         void onSuccess();
@@ -59,6 +60,19 @@ public class TranslationsRepository {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
+    
+    /**
+     * Constructor with Context for SessionManager caching
+     * @param context Application context for SessionManager
+     */
+    public TranslationsRepository(Context context) {
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+        this.sessionManager = new SessionManager(context);
+    }
 
     /**
      * Saves a new translation record to supabase
@@ -68,8 +82,9 @@ public class TranslationsRepository {
      */
     public void saveTranslation(Translation translation, Context context, SaveCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context); // creates new object of SessionManager to get the user from sharedprefs
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) { // this is for is the user is a guest
@@ -107,7 +122,7 @@ public class TranslationsRepository {
                         .addHeader("Prefer", "return=minimal")
                         .build();
 
-                Response response = client.newCall(request).execute(); // calling the request
+                response = client.newCall(request).execute(); // calling the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -123,14 +138,19 @@ public class TranslationsRepository {
                 callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
 
     public void loadTranslations(Context context, LoadCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context);  // creates new object of SessionManager to get the user from sharedprefs
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
                 User user = session.getUser();
 
                 if (user == null || user.getId() == null) {
@@ -153,7 +173,7 @@ public class TranslationsRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build(); // builds the request
 
-                Response response = client.newCall(request).execute(); // calls the request
+                response = client.newCall(request).execute(); // calls the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -207,15 +227,20 @@ public class TranslationsRepository {
                 callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     }
 
     public void deleteTranslation(Translation translation, Context context, DeleteCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
-                SessionManager session = new SessionManager(context); // creates new object session
-                User user = session.getUser(); // passes user in shared prefs to a new object of user
+                SessionManager session = sessionManager != null ? sessionManager : new SessionManager(context);
+                User user = session.getUser();
 
                 if (user == null || user.getId() == null || translation.getId() == null) {
                     callback.onError(new ApiException("Cannot delete: User not logged in or translation ID is null"));
@@ -234,7 +259,7 @@ public class TranslationsRepository {
                         .addHeader("Authorization", "Bearer " + SUPABASE_KEY)
                         .build();
 
-                Response response = client.newCall(request).execute(); // calling the request
+                response = client.newCall(request).execute(); // calling the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -250,6 +275,10 @@ public class TranslationsRepository {
                 callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     } // method to delete previous user translation
@@ -264,6 +293,7 @@ public class TranslationsRepository {
      */
     public void updateFavoriteStatus(String translationId, boolean isFavorite, FavoriteCallback callback) {
         new Thread(() -> {
+            Response response = null;
             try {
                 HttpUrl url = Objects.requireNonNull(HttpUrl.parse(SUPABASE_URL + "/rest/v1/translations"))
                         .newBuilder()
@@ -286,7 +316,7 @@ public class TranslationsRepository {
                         .addHeader("Prefer", "return=minimal")
                         .build(); // building the request (PATCH)
 
-                Response response = client.newCall(request).execute(); // making the request
+                response = client.newCall(request).execute(); // making the request
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
@@ -302,6 +332,10 @@ public class TranslationsRepository {
                 callback.onError(new NetworkException("Network Error: Connection timed out."));
             } catch (Exception e) {
                 callback.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }).start();
     } // Method to update previous translation

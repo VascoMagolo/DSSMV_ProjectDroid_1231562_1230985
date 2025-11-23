@@ -6,12 +6,15 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 /**
  * RecyclerView Adapter for displaying {@link GenericPhrase} objects in the PhrasesFragment.
  * This adapter handles two types of click events (translate and delete)
@@ -34,8 +37,15 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseView
     }
 
     public void updatePhrases(List<GenericPhrase> newPhrases) {
+        if (newPhrases == null) {
+            newPhrases = new ArrayList<>();
+        }
+        if (this.phraseList == null) {
+            this.phraseList = new ArrayList<>();
+        }
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new PhraseDiffCallback(this.phraseList, newPhrases));
         this.phraseList = newPhrases;
-        notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
     }
     public void setOnPhraseClickListener(OnPhraseClickListener listener) {
         this.phraseClickListener = listener;
@@ -108,6 +118,51 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseView
             textCategory = itemView.findViewById(R.id.textCategory);
             textLanguage = itemView.findViewById(R.id.textLanguage);
             btnDelete = itemView.findViewById(R.id.btn_delete_phrase);
+        }
+    }
+
+    /**
+     * DiffUtil.Callback for calculating the difference between two lists of phrases
+     */
+    private static class PhraseDiffCallback extends DiffUtil.Callback {
+        private final List<GenericPhrase> oldList;
+        private final List<GenericPhrase> newList;
+
+        public PhraseDiffCallback(List<GenericPhrase> oldList, List<GenericPhrase> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            GenericPhrase oldItem = oldList.get(oldItemPosition);
+            GenericPhrase newItem = newList.get(newItemPosition);
+            // For user phrases, compare by ID; for generic phrases, compare by text and language
+            if (oldItem.getId() != null && newItem.getId() != null) {
+                return Objects.equals(oldItem.getId(), newItem.getId());
+            }
+            return Objects.equals(oldItem.getText(), newItem.getText()) &&
+                   Objects.equals(oldItem.getLanguage(), newItem.getLanguage());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            GenericPhrase oldItem = oldList.get(oldItemPosition);
+            GenericPhrase newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getText(), newItem.getText()) &&
+                   Objects.equals(oldItem.getCategory(), newItem.getCategory()) &&
+                   Objects.equals(oldItem.getLanguage(), newItem.getLanguage()) &&
+                   oldItem.isUserPhrase() == newItem.isUserPhrase();
         }
     }
 }
