@@ -87,6 +87,12 @@ public class TranslationAdapter extends RecyclerView.Adapter<TranslationAdapter.
      * @param newList a new list of translation objects
      */
     public void updatetranslations(List<Translation> newList) {
+        if (newList == null) {
+            newList = new ArrayList<>();
+        }
+        if (this.translationList == null) {
+            this.translationList = new ArrayList<>();
+        }
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TranslationDiffCallback(this.translationList, newList));
         this.translationList = newList;
         diffResult.dispatchUpdatesTo(this);

@@ -36,6 +36,12 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseView
     }
 
     public void updatePhrases(List<GenericPhrase> newPhrases) {
+        if (newPhrases == null) {
+            newPhrases = new ArrayList<>();
+        }
+        if (this.phraseList == null) {
+            this.phraseList = new ArrayList<>();
+        }
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new PhraseDiffCallback(this.phraseList, newPhrases));
         this.phraseList = newPhrases;
         diffResult.dispatchUpdatesTo(this);
@@ -128,12 +134,12 @@ public class PhraseAdapter extends RecyclerView.Adapter<PhraseAdapter.PhraseView
 
         @Override
         public int getOldListSize() {
-            return oldList != null ? oldList.size() : 0;
+            return oldList.size();
         }
 
         @Override
         public int getNewListSize() {
-            return newList != null ? newList.size() : 0;
+            return newList.size();
         }
 
         @Override

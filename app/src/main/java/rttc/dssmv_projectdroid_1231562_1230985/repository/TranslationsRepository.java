@@ -31,7 +31,6 @@ public class TranslationsRepository {
     private final OkHttpClient client;
     private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
-    private final Context context;
     private SessionManager sessionManager;
 
     public interface SaveCallback { // Callback interface for Saving the translation
@@ -60,16 +59,18 @@ public class TranslationsRepository {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
-        this.context = null;
     }
     
+    /**
+     * Constructor with Context for SessionManager caching
+     * @param context Application context for SessionManager
+     */
     public TranslationsRepository(Context context) {
         this.client = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
-        this.context = context;
         this.sessionManager = new SessionManager(context);
     }
 

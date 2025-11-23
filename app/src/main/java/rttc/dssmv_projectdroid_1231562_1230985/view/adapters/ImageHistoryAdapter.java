@@ -41,6 +41,12 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
     }
 
     public void updateImageHistory(List<ImageHistory> newImageHistoryList) {
+        if (newImageHistoryList == null) {
+            newImageHistoryList = new ArrayList<>();
+        }
+        if (this.imageHistoryList == null) {
+            this.imageHistoryList = new ArrayList<>();
+        }
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ImageHistoryDiffCallback(this.imageHistoryList, newImageHistoryList));
         this.imageHistoryList = newImageHistoryList;
         diffResult.dispatchUpdatesTo(this);
@@ -144,12 +150,12 @@ public class ImageHistoryAdapter extends RecyclerView.Adapter<ImageHistoryAdapte
 
         @Override
         public int getOldListSize() {
-            return oldList != null ? oldList.size() : 0;
+            return oldList.size();
         }
 
         @Override
         public int getNewListSize() {
-            return newList != null ? newList.size() : 0;
+            return newList.size();
         }
 
         @Override
