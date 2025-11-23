@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import rttc.dssmv_projectdroid_1231562_1230985.R;
 import rttc.dssmv_projectdroid_1231562_1230985.model.GenericPhrase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 /**
